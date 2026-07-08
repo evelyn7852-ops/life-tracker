@@ -1,0 +1,4 @@
+:root { --bg:#faf9f5; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#c15f3c; --line:#e8e4da; }
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
+.app { max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; }
