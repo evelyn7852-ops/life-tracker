@@ -1,4 +1,4 @@
-import type { FoodData, ParseResult, SetGroup, WorkoutData } from './types'
+import type { FoodData, ParseResult, SetGroup, WorkoutData, ReadingData, LearningData, TravelData, EntryData } from './types'
 
 const MEAL_MAP: Record<string, FoodData['meal']> = {
   早餐: '早', 早饭: '早', 午餐: '午', 午饭: '午', 中饭: '午',
@@ -9,6 +9,7 @@ const WORKOUT_TYPES = ['瑜伽', '力量', '跑步', 'hyrox', 'crossfit', '健�
 
 const DURATION_RE = /(\d+(?:\.\d+)?)\s*(分钟|min|小时|h)/i
 const SETS_RE = /([一-龥a-zA-Z]+?)\s*(\d+(?:\.\d+)?)\s*kg\s*(\d+)\s*[x×X]\s*(\d+)/g
+const PAGES_RE = /(\d+)\s*页/
 
 function splitTokens(s: string): string[] {
   return s.split(/[\s,，、]+/).filter(Boolean)
@@ -19,6 +20,10 @@ function parseDuration(text: string): number | undefined {
   if (!m) return undefined
   const n = parseFloat(m[1])
   return /小时|h/i.test(m[2]) ? Math.round(n * 60) : Math.round(n)
+}
+
+function stripDurationAndPages(s: string): string {
+  return s.replace(DURATION_RE, '').replace(PAGES_RE, '').trim()
 }
 
 function parseFood(text: string): ParseResult | null {
@@ -57,7 +62,36 @@ export function parseEntry(text: string): ParseResult | null {
   return parseFood(t) ?? parseWorkout(t) ?? parseRest(t)
 }
 
-// parseRest 在 Task 4 实现；本 task 先占位返回 null
-function parseRest(_t: string): ParseResult | null {
+function parseRest(t: string): ParseResult | null {
+  // reading
+  const readM = t.match(/^(?:读|阅读|看书)\s*(.*)$/)
+  if (readM) {
+    const body = readM[1]
+    const title = splitTokens(stripDurationAndPages(body)).join(' ')
+    if (title) {
+      const data: EntryData = { title }
+      const pages = body.match(PAGES_RE); if (pages) (data as ReadingData).pages = parseInt(pages[1])
+      const min = parseDuration(body); if (min !== undefined) (data as ReadingData).minutes = min
+      return { domain: 'reading', data }
+    }
+  }
+  // learning
+  const learnM = t.match(/^(?:学习|学|上课)\s*(.*)$/)
+  if (learnM) {
+    const body = learnM[1]
+    const course = splitTokens(stripDurationAndPages(body)).join(' ')
+    if (course) {
+      const data: LearningData = { course }
+      const min = parseDuration(body); if (min !== undefined) data.minutes = min
+      return { domain: 'learning', data }
+    }
+  }
+  // travel
+  const travelM = t.match(/^(?:到达|抵达|出发去?|飞往|去了)\s*(.+)$/)
+  if (travelM) {
+    return { domain: 'travel', data: { place: splitTokens(travelM[1])[0], note: splitTokens(travelM[1]).slice(1).join(' ') || undefined } as TravelData }
+  }
+  // journal
+  if (/^(?:日记|随想|感想)/.test(t)) return { domain: 'journal', data: {} }
   return null
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { parseEntry } from './parser'
-import type { FoodData, WorkoutData } from './types'
+import type { FoodData, WorkoutData, ReadingData, LearningData, TravelData } from './types'
 
 describe('parseEntry: food', () => {
   it('午餐 + 多个食物', () => {
@@ -41,5 +41,42 @@ describe('parseEntry: workout', () => {
   })
   it('hyrox 大小写', () => {
     expect((parseEntry('Hyrox 60分钟')!.data as WorkoutData).type).toBe('hyrox')
+  })
+})
+
+describe('parseEntry: 其余四域', () => {
+  it('读书 + 页数', () => {
+    const r = parseEntry('读 纳瓦尔宝典 30页')!
+    expect(r.domain).toBe('reading')
+    const d = r.data as ReadingData
+    expect(d.title).toBe('纳瓦尔宝典')
+    expect(d.pages).toBe(30)
+  })
+  it('阅读 + 分钟', () => {
+    const d = parseEntry('阅读 尽头的回忆 40分钟')!.data as ReadingData
+    expect(d.title).toBe('尽头的回忆')
+    expect(d.minutes).toBe(40)
+  })
+  it('学习课程', () => {
+    const r = parseEntry('学 MCP开发 90分钟')!
+    expect(r.domain).toBe('learning')
+    const d = r.data as LearningData
+    expect(d.course).toBe('MCP开发')
+    expect(d.minutes).toBe(90)
+  })
+  it('旅行到达', () => {
+    const r = parseEntry('到达 清迈')!
+    expect(r.domain).toBe('travel')
+    expect((r.data as TravelData).place).toBe('清迈')
+  })
+  it('日记前缀', () => {
+    expect(parseEntry('日记 今天很累但值得')!.domain).toBe('journal')
+  })
+  it('解不出返回 null', () => {
+    expect(parseEntry('嗯')).toBeNull()
+    expect(parseEntry('')).toBeNull()
+  })
+  it('午餐优先于学(含学字食物句)', () => {
+    expect(parseEntry('午餐 学校食堂 鸡腿饭')!.domain).toBe('food')
   })
 })
