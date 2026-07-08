@@ -8,6 +8,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [msg, setMsg] = useState('')
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => { setSession(data.session); setReady(true) })
@@ -19,11 +20,18 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (session) return <>{children}</>
 
   const signIn = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error?.message.includes('Invalid login credentials')) {
-      const { error: e2 } = await supabase.auth.signUp({ email, password })
-      setMsg(e2 ? e2.message : '已注册并登录')
-    } else if (error) setMsg(error.message)
+    setBusy(true)
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error?.message.includes('Invalid login credentials')) {
+        const { data, error: e2 } = await supabase.auth.signUp({ email, password })
+        if (e2) setMsg(e2.message)
+        else if (data.session) setMsg('')
+        else if (data.user) setMsg('注册成功，需邮箱确认后登录，或让管理员关闭确认')
+      } else if (error) setMsg(error.message)
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -31,7 +39,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       <h1>Life Tracker</h1>
       <input type="email" placeholder="邮箱" value={email} onChange={(e) => setEmail(e.target.value)} />
       <input type="password" placeholder="密码" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={signIn}>登录 / 注册</button>
+      <button onClick={signIn} disabled={busy}>{busy ? '处理中…' : '登录 / 注册'}</button>
       {msg && <p className="muted">{msg}</p>}
     </div>
   )
