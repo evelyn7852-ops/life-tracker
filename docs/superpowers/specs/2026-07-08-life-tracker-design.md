@@ -29,8 +29,10 @@ PWA（Vite + React + TypeScript）— GitHub Pages 托管
 Supabase 免费档
    ├── Postgres：entries 单表
    ├── Auth：email 登录，单用户，RLS 按 user_id 隔离
-   └── Edge Function `parse-entry`：调 Claude Haiku 兜底解析
-        （ANTHROPIC_API_KEY 存 Supabase secret，永不进前端）
+   └── Edge Function `parse-entry`：调 LLM 兜底解析
+        （用户提供第三方中转站 key；LLM_API_KEY / LLM_BASE_URL / LLM_MODEL
+        存 Supabase secret，永不进前端；协议按 OpenAI-compatible 适配，
+        base URL 与模型名为部署时配置项）
 ```
 
 - 项目目录 `~/Projects/life-tracker`，git 管理
@@ -100,7 +102,7 @@ Supabase 免费档
 ## 8. 已知约束与风险
 
 - Supabase 免费档 7 天无活动暂停项目（日用不触发；长期不用需手动恢复）
-- LLM 解析需 Anthropic API key（用户提供），Haiku 单次约几厘钱
+- LLM 解析走用户提供的第三方中转站 key（已置于本地 .env，gitignored）；中转站稳定性不受我们控制，解析链已有手动降级兜底。key 曾出现在聊天记录中，建议项目稳定后轮换
 - GitHub Pages 免费档要求 repo 公开。可接受：前端代码无秘密（Supabase anon key 设计上可公开，数据由 RLS 保护）；若坚持私有 repo，改用 Vercel 免费托管，架构不变
 
 ## 9. 已定决策记录
