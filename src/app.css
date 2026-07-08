@@ -2,3 +2,8 @@
 * { box-sizing:border-box; margin:0; }
 body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
 .app { max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; }
+
+.auth { max-width:320px; margin:30dvh auto 0; display:flex; flex-direction:column; gap:12px; padding:0 16px; }
+.auth input, .auth button { padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; }
+.auth button { background:var(--accent); color:#fff; border:none; }
+.muted { color:var(--muted); font-size:13px; }

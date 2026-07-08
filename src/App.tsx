@@ -1,3 +1,9 @@
+import { AuthGate } from './components/AuthGate'
+
 export default function App() {
-  return <div className="app">Life Tracker</div>
+  return (
+    <AuthGate>
+      <div className="app">已登录</div>
+    </AuthGate>
+  )
 }
