@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { AuthGate } from './components/AuthGate'
+import { HistoryView } from './components/HistoryView'
 import { QuickInput } from './components/QuickInput'
 import { TodayView } from './components/TodayView'
+import { WeekView } from './components/WeekView'
 import { flushOutbox } from './lib/outbox'
 
 type Tab = 'today' | 'history' | 'week'
@@ -24,8 +26,8 @@ export default function App() {
         <QuickInput onSaved={bump} />
         <main className="main">
           {tab === 'today' && <TodayView refreshKey={refreshKey} />}
-          {tab === 'history' && <p className="muted empty">历史（Task 11）</p>}
-          {tab === 'week' && <p className="muted empty">周览（Task 11）</p>}
+          {tab === 'history' && <HistoryView refreshKey={refreshKey} />}
+          {tab === 'week' && <WeekView refreshKey={refreshKey} />}
         </main>
         <nav className="tabs">
           {(['today', 'history', 'week'] as Tab[]).map((t) => (
