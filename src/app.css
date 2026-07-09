@@ -1,4 +1,4 @@
-:root { --bg:#faf9f5; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#c15f3c; --line:#e8e4da; }
+:root { --bg:#faf9f5; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#c15f3c; --line:#e8e4da; --klein:#002FA5; }
 * { box-sizing:border-box; margin:0; }
 body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
 button, .card-text, .day-dot { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
@@ -49,3 +49,24 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .bar-track { flex:1; height:14px; background:var(--card); border-radius:7px; overflow:hidden; }
 .bar { height:100%; border-radius:7px; }
 .bar-n { width:24px; text-align:right; font-size:13px; color:var(--muted); }
+
+.home-view { align-items:center; padding-top:4px; }
+.home-image { width:100%; aspect-ratio:4/3; border-radius:16px; overflow:hidden; background:var(--klein); }
+.home-image img { width:100%; height:100%; object-fit:cover; display:block; }
+.home-image-fallback { background:var(--klein); }
+.home-date { font-size:26px; font-weight:700; margin-top:6px; }
+.home-clock { margin-top:-6px; }
+.home-view .mood-row { justify-content:center; }
+.home-quote-card { width:100%; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; text-align:center; }
+.home-quote-text { font-size:15px; line-height:1.7; }
+.home-quote-author { margin-top:8px; font-size:12px; }
+
+.summary-section { border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
+.section-title { font-size:13px; font-weight:600; margin-bottom:8px; }
+.summary-tabs { display:flex; gap:8px; margin-bottom:8px; }
+.summary-tabs button { padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:13px; color:var(--muted); }
+.summary-tabs button.on { border-color:var(--accent); color:var(--accent); font-weight:600; }
+.summary-content { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:14px; line-height:1.7; }
+.summary-content p + p { margin-top:8px; }
+.summary-actions { margin-top:8px; }
+.summary-actions button, .summary-empty button { padding:8px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
