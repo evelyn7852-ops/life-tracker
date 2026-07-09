@@ -20,6 +20,15 @@ function periodStart(type: PeriodType): string {
   return toDateStr(type === 'week' ? weekStart() : monthStart())
 }
 
+/** 本地时区周期 ISO 边界 [from, to)，随请求发给 summarize 供 entries 查询直接使用。 */
+function periodBounds(type: PeriodType): { fromTs: string; toTs: string } {
+  const start = type === 'week' ? weekStart() : monthStart()
+  const end = new Date(start)
+  if (type === 'week') end.setDate(end.getDate() + 7)
+  else end.setMonth(end.getMonth() + 1)
+  return { fromTs: start.toISOString(), toTs: end.toISOString() }
+}
+
 export function WeekView({ refreshKey, active }: { refreshKey: number; active: boolean }) {
   const [rows, setRows] = useState<Entry[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,7 +71,8 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
     setGenerating(true)
     setSummaryError(null)
     try {
-      const content = await generateSummary(summaryType, periodStart(summaryType))
+      const { fromTs, toTs } = periodBounds(summaryType)
+      const content = await generateSummary(summaryType, periodStart(summaryType), fromTs, toTs)
       setSummary({ id: '', period_type: summaryType, period_start: periodStart(summaryType), content, created_at: new Date().toISOString() })
     } catch {
       setSummaryError('生成失败，请重试')

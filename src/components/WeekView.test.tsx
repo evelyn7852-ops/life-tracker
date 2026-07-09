@@ -9,7 +9,7 @@ const getSummaryMock = vi.fn()
 const generateSummaryMock = vi.fn()
 vi.mock('../lib/summaryRepo', () => ({
   getSummary: (t: string, s: string) => getSummaryMock(t, s),
-  generateSummary: (t: string, s: string) => generateSummaryMock(t, s),
+  generateSummary: (t: string, s: string, f: string, to: string) => generateSummaryMock(t, s, f, to),
 }))
 
 import { WeekView } from './WeekView'
@@ -41,6 +41,37 @@ describe('WeekView AI 总结', () => {
     expect(await screen.findByText('生成中…')).toBeTruthy()
     resolveGen('生成的总结')
     expect(await screen.findByText('生成的总结')).toBeTruthy()
+  })
+
+  it('生成请求带本地时区 ISO 边界 from_ts/to_ts 且 from<to', async () => {
+    getSummaryMock.mockResolvedValue(null)
+    generateSummaryMock.mockResolvedValue('ok')
+    render(<WeekView refreshKey={0} active />)
+    await userEvent.click(await screen.findByText('生成本周总结'))
+    expect(generateSummaryMock).toHaveBeenCalledWith(
+      'week',
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      expect.any(String),
+      expect.any(String),
+    )
+    const [, periodStartArg, fromTs, toTs] = generateSummaryMock.mock.calls[0]
+    // ISO 且可解析
+    expect(Number.isNaN(Date.parse(fromTs))).toBe(false)
+    expect(Number.isNaN(Date.parse(toTs))).toBe(false)
+    expect(new Date(fromTs).getTime()).toBeLessThan(new Date(toTs).getTime())
+    // from_ts 是本地周一 00:00（非 UTC 解析的 period_start）
+    const localMonday = new Date()
+    localMonday.setDate(localMonday.getDate() - ((localMonday.getDay() + 6) % 7))
+    localMonday.setHours(0, 0, 0, 0)
+    expect(fromTs).toBe(localMonday.toISOString())
+    // period_start 仍是本地日期字符串（缓存键）
+    expect(periodStartArg).toBe(
+      `${localMonday.getFullYear()}-${String(localMonday.getMonth() + 1).padStart(2, '0')}-${String(localMonday.getDate()).padStart(2, '0')}`,
+    )
+    // to_ts = 本地下周一 00:00
+    const localNextMonday = new Date(localMonday)
+    localNextMonday.setDate(localNextMonday.getDate() + 7)
+    expect(toTs).toBe(localNextMonday.toISOString())
   })
 
   it('切到本月 → 用 month 参数重新查询缓存', async () => {

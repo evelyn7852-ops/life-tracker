@@ -11,14 +11,10 @@ const DOMAIN_LABEL: Record<string, string> = {
 
 const MAX_RAW_TEXT_CHARS = 3000
 
-type PeriodType = 'week' | 'month'
-
-function periodEnd(periodType: PeriodType, start: Date): Date {
-  const end = new Date(start)
-  if (periodType === 'week') end.setDate(end.getDate() + 7)
-  else end.setMonth(end.getMonth() + 1)
-  return end
-}
+// 周期实际边界由客户端以其本地时区计算后随请求传入（from_ts/to_ts），服务端
+// 原样用于 entries 查询——不能从 period_start 自推：'YYYY-MM-DD' 会被解析成
+// UTC 午夜，UTC+8 用户周期头 8 小时的记录会错归到上一周期。
+// period_start 仅作 summaries 表的缓存键。
 
 Deno.serve(async (req) => {
   const cors = {
@@ -39,18 +35,25 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'missing authorization' }), { status: 401, headers: cors })
   }
 
-  let body: { period_type?: string; period_start?: string }
+  let body: { period_type?: string; period_start?: string; from_ts?: string; to_ts?: string }
   try {
     body = await req.json()
   } catch {
     return new Response(JSON.stringify({ error: 'invalid json body' }), { status: 400, headers: cors })
   }
-  const { period_type, period_start } = body
+  const { period_type, period_start, from_ts, to_ts } = body
   if (period_type !== 'week' && period_type !== 'month') {
     return new Response(JSON.stringify({ error: 'period_type must be week or month' }), { status: 400, headers: cors })
   }
   if (!period_start || Number.isNaN(Date.parse(period_start))) {
     return new Response(JSON.stringify({ error: 'period_start required (YYYY-MM-DD)' }), { status: 400, headers: cors })
+  }
+  if (typeof from_ts !== 'string' || Number.isNaN(Date.parse(from_ts)) ||
+      typeof to_ts !== 'string' || Number.isNaN(Date.parse(to_ts))) {
+    return new Response(JSON.stringify({ error: 'from_ts/to_ts required (ISO timestamps)' }), { status: 400, headers: cors })
+  }
+  if (Date.parse(from_ts) >= Date.parse(to_ts)) {
+    return new Response(JSON.stringify({ error: 'from_ts must be before to_ts' }), { status: 400, headers: cors })
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -71,14 +74,11 @@ Deno.serve(async (req) => {
   }
   const userId = userData.user.id
 
-  const start = new Date(period_start)
-  const end = periodEnd(period_type, start)
-
   const { data: entries, error: entriesErr } = await supabase
     .from('entries')
     .select('ts, domain, raw_text')
-    .gte('ts', start.toISOString())
-    .lt('ts', end.toISOString())
+    .gte('ts', from_ts)
+    .lt('ts', to_ts)
     .order('ts', { ascending: true })
     .limit(500)
   if (entriesErr) {
