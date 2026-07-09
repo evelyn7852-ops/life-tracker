@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
 
@@ -7,15 +7,21 @@ function weekStart(): Date {
   d.setDate(d.getDate() - day); d.setHours(0, 0, 0, 0); return d
 }
 
-export function WeekView({ refreshKey }: { refreshKey: number }) {
+export function WeekView({ refreshKey, active }: { refreshKey: number; active: boolean }) {
   const [rows, setRows] = useState<Entry[]>([])
   const [loading, setLoading] = useState(true)
+  const lastFetched = useRef(-1)
   const load = useCallback(async () => {
     setLoading(true)
     setRows(await listEntries({ fromTs: weekStart().toISOString(), limit: 500 }))
     setLoading(false)
   }, [])
-  useEffect(() => { load() }, [load, refreshKey])
+  useEffect(() => {
+    if (active && lastFetched.current !== refreshKey) {
+      lastFetched.current = refreshKey
+      load()
+    }
+  }, [active, refreshKey, load])
 
   const counts = ALL_DOMAINS.map((d) => ({ d, n: rows.filter((r) => r.domain === d).length }))
   const max = Math.max(1, ...counts.map((c) => c.n))
@@ -23,8 +29,9 @@ export function WeekView({ refreshKey }: { refreshKey: number }) {
 
   return (
     <div className="view">
-      {loading && <p className="muted empty">加载中…</p>}
-      {!loading && (
+      {loading && rows.length === 0 ? (
+        <p className="muted empty">加载中…</p>
+      ) : (
         <>
           <p className="muted">本周记录 {rows.length} 条 · 活跃 {days.size} 天</p>
           {counts.map(({ d, n }) => (

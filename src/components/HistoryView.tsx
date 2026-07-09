@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Domain, type Entry } from '../lib/types'
 import { EntryCard } from './EntryCard'
 
 const PAGE = 30
 
-export function HistoryView({ refreshKey }: { refreshKey: number }) {
+export function HistoryView({ refreshKey, active }: { refreshKey: number; active: boolean }) {
   const [rows, setRows] = useState<Entry[]>([])
   const [domain, setDomain] = useState<Domain | undefined>()
   const [done, setDone] = useState(false)
   const [loading, setLoading] = useState(true)
+  const lastFetched = useRef('')
 
   const load = useCallback(async (reset: boolean, before?: string) => {
     if (reset) setLoading(true)
@@ -19,7 +20,13 @@ export function HistoryView({ refreshKey }: { refreshKey: number }) {
     if (reset) setLoading(false)
   }, [domain])
 
-  useEffect(() => { load(true) }, [load, refreshKey])
+  useEffect(() => {
+    const key = `${refreshKey}|${domain ?? ''}` // 域筛选变化也要重拉
+    if (active && lastFetched.current !== key) {
+      lastFetched.current = key
+      load(true)
+    }
+  }, [active, refreshKey, domain, load])
 
   let lastDay = ''
   return (
@@ -46,7 +53,7 @@ export function HistoryView({ refreshKey }: { refreshKey: number }) {
       {!done && !loading && rows.length > 0 && (
         <button className="more" onClick={() => load(false, rows[rows.length - 1].ts)}>加载更多</button>
       )}
-      {loading && <p className="muted empty">加载中…</p>}
+      {loading && rows.length === 0 && <p className="muted empty">加载中…</p>}
       {!loading && rows.length === 0 && <p className="muted empty">没有记录</p>}
     </div>
   )

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
 import { EntryCard } from './EntryCard'
@@ -9,15 +9,21 @@ function dayRange(d = new Date()): { fromTs: string; toTs: string } {
   return { fromTs: start.toISOString(), toTs: end.toISOString() }
 }
 
-export function TodayView({ refreshKey }: { refreshKey: number }) {
+export function TodayView({ refreshKey, active }: { refreshKey: number; active: boolean }) {
   const [rows, setRows] = useState<Entry[]>([])
   const [loading, setLoading] = useState(true)
+  const lastFetched = useRef(-1)
   const load = useCallback(async () => {
     setLoading(true)
     setRows(await listEntries({ ...dayRange(), limit: 100 }))
     setLoading(false)
   }, [])
-  useEffect(() => { load() }, [load, refreshKey])
+  useEffect(() => {
+    if (active && lastFetched.current !== refreshKey) {
+      lastFetched.current = refreshKey
+      load()
+    }
+  }, [active, refreshKey, load])
 
   const done = new Set(rows.map((r) => r.domain))
   return (
@@ -29,7 +35,7 @@ export function TodayView({ refreshKey }: { refreshKey: number }) {
           </span>
         ))}
       </div>
-      {loading && <p className="muted empty">加载中…</p>}
+      {loading && rows.length === 0 && <p className="muted empty">加载中…</p>}
       {!loading && rows.length === 0 && <p className="muted empty">今天还没记录</p>}
       {rows.map((e) => <EntryCard key={e.id} entry={e} onChanged={load} />)}
     </div>
