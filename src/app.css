@@ -7,3 +7,11 @@ body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFa
 .auth input, .auth button { padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; }
 .auth button { background:var(--accent); color:#fff; border:none; }
 .muted { color:var(--muted); font-size:13px; }
+
+.qi { position:sticky; top:0; background:var(--bg); padding:12px 16px; border-bottom:1px solid var(--line); z-index:10; }
+.qi input { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; }
+.qi-preview { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+.chip { padding:4px 10px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:13px; }
+.chip-domain { background:var(--accent); color:#fff; border:none; }
+.qi-summary { font-size:13px; color:var(--muted); flex:1; }
+.qi-preview button:not(.chip) { padding:6px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; }
