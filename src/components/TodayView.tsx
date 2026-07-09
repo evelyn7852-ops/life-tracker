@@ -11,8 +11,11 @@ function dayRange(d = new Date()): { fromTs: string; toTs: string } {
 
 export function TodayView({ refreshKey }: { refreshKey: number }) {
   const [rows, setRows] = useState<Entry[]>([])
+  const [loading, setLoading] = useState(true)
   const load = useCallback(async () => {
+    setLoading(true)
     setRows(await listEntries({ ...dayRange(), limit: 100 }))
+    setLoading(false)
   }, [])
   useEffect(() => { load() }, [load, refreshKey])
 
@@ -26,7 +29,8 @@ export function TodayView({ refreshKey }: { refreshKey: number }) {
           </span>
         ))}
       </div>
-      {rows.length === 0 && <p className="muted empty">今天还没记录</p>}
+      {loading && <p className="muted empty">加载中…</p>}
+      {!loading && rows.length === 0 && <p className="muted empty">今天还没记录</p>}
       {rows.map((e) => <EntryCard key={e.id} entry={e} onChanged={load} />)}
     </div>
   )

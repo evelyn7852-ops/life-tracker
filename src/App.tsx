@@ -27,9 +27,9 @@ export default function App() {
         <MoodHeader refreshKey={refreshKey} onSaved={bump} />
         <QuickInput onSaved={bump} />
         <main className="main">
-          {tab === 'today' && <TodayView refreshKey={refreshKey} />}
-          {tab === 'history' && <HistoryView refreshKey={refreshKey} />}
-          {tab === 'week' && <WeekView refreshKey={refreshKey} />}
+          <div hidden={tab !== 'today'}><TodayView refreshKey={refreshKey} /></div>
+          <div hidden={tab !== 'history'}><HistoryView refreshKey={refreshKey} /></div>
+          <div hidden={tab !== 'week'}><WeekView refreshKey={refreshKey} /></div>
         </main>
         <nav className="tabs">
           {(['today', 'history', 'week'] as Tab[]).map((t) => (

@@ -9,11 +9,14 @@ export function HistoryView({ refreshKey }: { refreshKey: number }) {
   const [rows, setRows] = useState<Entry[]>([])
   const [domain, setDomain] = useState<Domain | undefined>()
   const [done, setDone] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const load = useCallback(async (reset: boolean, before?: string) => {
+    if (reset) setLoading(true)
     const batch = await listEntries({ domain, limit: PAGE, beforeTs: before })
     setDone(batch.length < PAGE)
     setRows((prev) => reset ? batch : [...prev, ...batch])
+    if (reset) setLoading(false)
   }, [domain])
 
   useEffect(() => { load(true) }, [load, refreshKey])
@@ -40,10 +43,11 @@ export function HistoryView({ refreshKey }: { refreshKey: number }) {
           </div>
         )
       })}
-      {!done && rows.length > 0 && (
+      {!done && !loading && rows.length > 0 && (
         <button className="more" onClick={() => load(false, rows[rows.length - 1].ts)}>加载更多</button>
       )}
-      {rows.length === 0 && <p className="muted empty">没有记录</p>}
+      {loading && <p className="muted empty">加载中…</p>}
+      {!loading && rows.length === 0 && <p className="muted empty">没有记录</p>}
     </div>
   )
 }

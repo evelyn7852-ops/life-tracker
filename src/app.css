@@ -1,6 +1,8 @@
 :root { --bg:#faf9f5; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#c15f3c; --line:#e8e4da; }
 * { box-sizing:border-box; margin:0; }
 body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
+button, .card-text, .day-dot { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .app { max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; }
 
 .auth { max-width:320px; margin:30dvh auto 0; display:flex; flex-direction:column; gap:12px; padding:0 16px; }
@@ -32,7 +34,7 @@ body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFa
 .card-text { font-size:15px; }
 .card-edit { display:flex; gap:6px; }
 .card-edit input { flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; }
-.card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; }
+.card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; padding:12px; margin:-12px; }
 .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
 .dot-food{background:#d97706}.dot-workout{background:#c15f3c}.dot-travel{background:#0e7490}
 .dot-reading{background:#7c3aed}.dot-journal{background:#64748b}.dot-learning{background:#15803d}
