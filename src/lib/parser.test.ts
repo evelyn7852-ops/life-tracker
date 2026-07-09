@@ -64,8 +64,20 @@ describe('parseEntry: 其余四域', () => {
     expect(d.course).toBe('MCP开发')
     expect(d.minutes).toBe(90)
   })
+  it('课(独立触发词)', () => {
+    const r = parseEntry('课 Python实战 30分钟')!
+    expect(r.domain).toBe('learning')
+    const d = r.data as LearningData
+    expect(d.course).toBe('Python实战')
+    expect(d.minutes).toBe(30)
+  })
   it('旅行到达', () => {
     const r = parseEntry('到达 清迈')!
+    expect(r.domain).toBe('travel')
+    expect((r.data as TravelData).place).toBe('清迈')
+  })
+  it('旅行(独立触发词)', () => {
+    const r = parseEntry('旅行 清迈')!
     expect(r.domain).toBe('travel')
     expect((r.data as TravelData).place).toBe('清迈')
   })

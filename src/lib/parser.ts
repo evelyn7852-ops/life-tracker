@@ -76,7 +76,7 @@ function parseRest(t: string): ParseResult | null {
     }
   }
   // learning
-  const learnM = t.match(/^(?:学习|学|上课)\s*(.*)$/)
+  const learnM = t.match(/^(?:学习|上课|课|学)\s*(.*)$/)
   if (learnM) {
     const body = learnM[1]
     const course = splitTokens(stripDurationAndPages(body)).join(' ')
@@ -87,7 +87,7 @@ function parseRest(t: string): ParseResult | null {
     }
   }
   // travel
-  const travelM = t.match(/^(?:到达|抵达|出发去?|飞往|去了)\s*(.+)$/)
+  const travelM = t.match(/^(?:到达|抵达|出发去?|飞往|去了|旅行)\s*(.+)$/)
   if (travelM) {
     return { domain: 'travel', data: { place: splitTokens(travelM[1])[0], note: splitTokens(travelM[1]).slice(1).join(' ') || undefined } as TravelData }
   }
