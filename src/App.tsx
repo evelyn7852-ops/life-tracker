@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AuthGate } from './components/AuthGate'
 import { HistoryView } from './components/HistoryView'
+import { MoodHeader } from './components/MoodHeader'
 import { QuickInput } from './components/QuickInput'
 import { TodayView } from './components/TodayView'
 import { WeekView } from './components/WeekView'
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <AuthGate>
       <div className="app">
+        <MoodHeader refreshKey={refreshKey} onSaved={bump} />
         <QuickInput onSaved={bump} />
         <main className="main">
           {tab === 'today' && <TodayView refreshKey={refreshKey} />}
