@@ -6,7 +6,7 @@ const BING_URL = 'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mk
 Deno.serve(async (req) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   }
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'GET') {

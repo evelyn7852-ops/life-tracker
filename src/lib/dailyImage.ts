@@ -32,7 +32,7 @@ export async function fetchDailyImage(): Promise<DailyImage | null> {
   if (cached) return cached
 
   try {
-    const { data, error } = await supabase.functions.invoke('daily-image')
+    const { data, error } = await supabase.functions.invoke('daily-image', { method: 'GET' })
     if (error || typeof data?.url !== 'string') return null
     const image: DailyImage = { url: data.url, copyright: typeof data.copyright === 'string' ? data.copyright : '' }
     writeCache(key, image)
