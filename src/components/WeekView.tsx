@@ -1,10 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
+import { generateSummary, getSummary, type PeriodType, type Summary } from '../lib/summaryRepo'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
 
 function weekStart(): Date {
   const d = new Date(); const day = (d.getDay() + 6) % 7 // 周一起
   d.setDate(d.getDate() - day); d.setHours(0, 0, 0, 0); return d
+}
+
+function monthStart(): Date {
+  const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d
+}
+
+function toDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function periodStart(type: PeriodType): string {
+  return toDateStr(type === 'week' ? weekStart() : monthStart())
 }
 
 export function WeekView({ refreshKey, active }: { refreshKey: number; active: boolean }) {
@@ -23,9 +36,45 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
     }
   }, [active, refreshKey, load])
 
+  const [summaryType, setSummaryType] = useState<PeriodType>('week')
+  const [summary, setSummary] = useState<Summary | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [summaryError, setSummaryError] = useState<string | null>(null)
+
+  const loadSummary = useCallback(async (type: PeriodType) => {
+    setSummaryLoading(true)
+    setSummaryError(null)
+    try {
+      setSummary(await getSummary(type, periodStart(type)))
+    } catch {
+      setSummaryError('加载总结失败')
+    } finally {
+      setSummaryLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (active) loadSummary(summaryType)
+  }, [active, summaryType, loadSummary])
+
+  const handleGenerate = async () => {
+    setGenerating(true)
+    setSummaryError(null)
+    try {
+      const content = await generateSummary(summaryType, periodStart(summaryType))
+      setSummary({ id: '', period_type: summaryType, period_start: periodStart(summaryType), content, created_at: new Date().toISOString() })
+    } catch {
+      setSummaryError('生成失败，请重试')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   const counts = ALL_DOMAINS.map((d) => ({ d, n: rows.filter((r) => r.domain === d).length }))
   const max = Math.max(1, ...counts.map((c) => c.n))
   const days = new Set(rows.map((r) => new Date(r.ts).toDateString()))
+  const periodLabel = summaryType === 'week' ? '本周' : '本月'
 
   return (
     <div className="view">
@@ -43,6 +92,32 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
           ))}
         </>
       )}
+
+      <div className="summary-section">
+        <p className="section-title">AI 总结</p>
+        <div className="summary-tabs">
+          <button className={summaryType === 'week' ? 'on' : ''} onClick={() => setSummaryType('week')}>本周</button>
+          <button className={summaryType === 'month' ? 'on' : ''} onClick={() => setSummaryType('month')}>本月</button>
+        </div>
+        {summaryLoading && <p className="muted">加载中…</p>}
+        {!summaryLoading && generating && <p className="muted">生成中…</p>}
+        {!summaryLoading && !generating && summary && (
+          <>
+            <div className="summary-content">
+              {summary.content.split('\n').filter((line) => line.trim()).map((line, i) => <p key={i}>{line}</p>)}
+            </div>
+            <div className="summary-actions">
+              <button onClick={handleGenerate}>重新生成</button>
+            </div>
+          </>
+        )}
+        {!summaryLoading && !generating && !summary && (
+          <div className="summary-empty">
+            <button onClick={handleGenerate}>生成{periodLabel}总结</button>
+          </div>
+        )}
+        {summaryError && <p className="muted">{summaryError}</p>}
+      </div>
     </div>
   )
 }
