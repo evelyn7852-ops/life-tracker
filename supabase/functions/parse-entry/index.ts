@@ -48,6 +48,27 @@ function isDomainKey(v: unknown): v is DomainKey {
   return typeof v === 'string' && Object.prototype.hasOwnProperty.call(DOMAIN_FIELDS, v)
 }
 
+// SetGroup whitelist mirrors src/lib/types.ts: exercise/sets/reps required, weight_kg optional.
+const SET_GROUP_FIELDS = ['exercise', 'weight_kg', 'sets', 'reps']
+const SET_GROUP_REQUIRED = ['exercise', 'sets', 'reps']
+
+// Whitelist each element of workout's sets array; drop elements missing
+// required fields. Returns undefined when nothing survives (sets is optional).
+function sanitizeSets(sets: unknown): Record<string, unknown>[] | undefined {
+  if (!Array.isArray(sets)) return undefined
+  const out: Record<string, unknown>[] = []
+  for (const el of sets) {
+    if (typeof el !== 'object' || el === null) continue
+    const record = el as Record<string, unknown>
+    const group: Record<string, unknown> = {}
+    for (const key of SET_GROUP_FIELDS) {
+      if (record[key] !== undefined) group[key] = record[key]
+    }
+    if (SET_GROUP_REQUIRED.every((key) => group[key] !== undefined)) out.push(group)
+  }
+  return out.length > 0 ? out : undefined
+}
+
 // Whitelist + require: drop any field the model invented, and reject the
 // result outright if a required field for that domain is missing.
 function sanitizeData(domain: DomainKey, data: unknown): Record<string, unknown> | null {
@@ -56,6 +77,11 @@ function sanitizeData(domain: DomainKey, data: unknown): Record<string, unknown>
   const out: Record<string, unknown> = {}
   for (const key of DOMAIN_FIELDS[domain]) {
     if (record[key] !== undefined) out[key] = record[key]
+  }
+  if (domain === 'workout' && out.sets !== undefined) {
+    const sets = sanitizeSets(out.sets)
+    if (sets === undefined) delete out.sets
+    else out.sets = sets
   }
   for (const key of DOMAIN_REQUIRED[domain]) {
     if (out[key] === undefined) return null
@@ -81,6 +107,9 @@ Deno.serve(async (req) => {
   const baseUrl = Deno.env.get('LLM_BASE_URL') ?? DEFAULT_LLM_BASE_URL
   const model = Deno.env.get('LLM_MODEL') ?? DEFAULT_LLM_MODEL
   const apiKey = Deno.env.get('LLM_API_KEY')
+  if (!apiKey) {
+    return new Response(JSON.stringify({ error: 'LLM_API_KEY not configured' }), { status: 500, headers: cors })
+  }
 
   let resp: Response
   try {
