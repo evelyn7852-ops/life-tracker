@@ -45,4 +45,17 @@ describe('outbox', () => {
     expect(await saveEntry(draft)).toBe('queued')
     expect(await pendingCount()).toBe(1)
   })
+  it('flush 重入返回同一 in-flight promise，不重复上传', async () => {
+    let release!: () => void
+    const gate = new Promise<void>((r) => { release = r })
+    insertMock.mockImplementation(async () => { await gate; return {} })
+    await queueEntry(draft); await queueEntry(draft)
+    const p1 = flushOutbox()
+    const p2 = flushOutbox()
+    expect(p2).toBe(p1)
+    release()
+    expect(await p1).toBe(2)
+    expect(insertMock).toHaveBeenCalledTimes(2)
+    expect(await pendingCount()).toBe(0)
+  })
 })

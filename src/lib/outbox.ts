@@ -18,7 +18,7 @@ export async function pendingCount(): Promise<number> {
   return (await read()).length
 }
 
-export async function flushOutbox(): Promise<number> {
+async function doFlush(): Promise<number> {
   const q = await read()
   const remain: NewEntry[] = []
   let ok = 0
@@ -27,6 +27,13 @@ export async function flushOutbox(): Promise<number> {
   }
   await set(KEY, remain)
   return ok
+}
+
+let inFlight: Promise<number> | null = null
+export function flushOutbox(): Promise<number> {
+  if (inFlight) return inFlight
+  inFlight = doFlush().finally(() => { inFlight = null })
+  return inFlight
 }
 
 export async function saveEntry(draft: NewEntry): Promise<'synced' | 'queued'> {
