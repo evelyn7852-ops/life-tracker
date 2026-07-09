@@ -58,4 +58,17 @@ describe('outbox', () => {
     expect(insertMock).toHaveBeenCalledTimes(2)
     expect(await pendingCount()).toBe(0)
   })
+  it('flush 进行中新入队的条目不被清空覆盖', async () => {
+    let release!: () => void
+    const gate = new Promise<void>((r) => { release = r })
+    insertMock.mockImplementation(async () => { await gate; return {} })
+    await queueEntry(draft)
+    const p = flushOutbox()
+    // 在 flush 尚未完成（insertEntry 被 gate 卡住）时并发入队
+    const draft2: NewEntry = { ...draft, raw_text: '晚餐 面' }
+    await queueEntry(draft2)
+    release()
+    expect(await p).toBe(1)
+    expect(await pendingCount()).toBe(1)
+  })
 })
