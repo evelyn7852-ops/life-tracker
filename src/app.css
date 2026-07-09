@@ -34,7 +34,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .card-text { font-size:15px; }
 .card-edit { display:flex; gap:6px; }
 .card-edit input { flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; }
-.card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; padding:12px; margin:-12px; }
+.card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; padding:16px 14px; margin:-16px -14px; }
 .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
 .dot-food{background:#d97706}.dot-workout{background:#c15f3c}.dot-travel{background:#0e7490}
 .dot-reading{background:#7c3aed}.dot-journal{background:#64748b}.dot-learning{background:#15803d}
