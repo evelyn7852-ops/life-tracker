@@ -10,9 +10,9 @@ const DEFAULT_LLM_MODEL = 'agnes-2.0-flash'
 const SENTENCE_SYSTEM = '你是一个旅行随笔作者。只输出一句中文短句，不超过40个字；不要加引号、不要署名、不要引用他人诗句或格言（避免杜撰出处）；语气贴近旅行/生活/自然，与地点或当前季节呼应。直接输出正文，不要任何解释或标点前后缀。'
 
 /** 基于 Bing 图片版权信息（含地点）请求 LLM 生成一句地点化短句；失败/未配置时返回 null，调用方降级为语录库。 */
-async function generateSentence(copyright: string): Promise<string | null> {
+async function generateSentence(copyright: string, debug?: (msg: string) => void): Promise<string | null> {
   const apiKey = Deno.env.get('LLM_API_KEY')
-  if (!apiKey) return null
+  if (!apiKey) { debug?.('no LLM_API_KEY'); return null }
   const baseUrl = Deno.env.get('LLM_BASE_URL') ?? DEFAULT_LLM_BASE_URL
   const model = Deno.env.get('LLM_MODEL') ?? DEFAULT_LLM_MODEL
 
@@ -44,19 +44,21 @@ async function generateSentence(copyright: string): Promise<string | null> {
       }),
       signal: AbortSignal.timeout(20000),
     })
-  } catch {
+  } catch (e) {
+    debug?.(`fetch threw: ${String(e).slice(0, 200)}`)
     return null
   }
-  if (!resp.ok) return null
+  if (!resp.ok) { debug?.(`llm status ${resp.status}: ${(await resp.text()).slice(0, 200)}`); return null }
 
   try {
     const respBody = await resp.json()
     let content = String(respBody.choices[0].message.content).trim()
     content = content.replace(/^[「"'“」]+|[」"'”「]+$/g, '').trim()
-    if (!content) return null
+    if (!content) { debug?.('empty content'); return null }
     if (content.length > 40) content = content.slice(0, 40)
     return content
-  } catch {
+  } catch (e) {
+    debug?.(`parse threw: ${String(e).slice(0, 200)}`)
     return null
   }
 }
@@ -94,10 +96,15 @@ Deno.serve(async (req) => {
   }
   const copyright = typeof first?.copyright === 'string' ? first.copyright : ''
   // ?fast=1：跳过 LLM 立刻回图（客户端两段式加载，句子随后单独取）
-  const fast = new URL(req.url).searchParams.get('fast') === '1'
-  const sentence = fast ? null : await generateSentence(copyright)
+  const params = new URL(req.url).searchParams
+  const fast = params.get('fast') === '1'
+  const debugMsgs: string[] = []
+  const wantDebug = params.get('debug') === '1'
+  const sentence = fast ? null : await generateSentence(copyright, wantDebug ? (m) => debugMsgs.push(m) : undefined)
 
-  return new Response(JSON.stringify({ url: `https://cn.bing.com${urlPath}`, copyright, sentence }), {
+  const payload: Record<string, unknown> = { url: `https://cn.bing.com${urlPath}`, copyright, sentence }
+  if (wantDebug) payload.debug = debugMsgs
+  return new Response(JSON.stringify(payload), {
     headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
   })
 })
