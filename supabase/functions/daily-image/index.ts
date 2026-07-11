@@ -17,9 +17,13 @@ async function generateSentence(copyright: string): Promise<string | null> {
   const model = Deno.env.get('LLM_MODEL') ?? DEFAULT_LLM_MODEL
 
   const place = copyright.trim()
+  // 东八区月份 → 季节，注入 prompt 防止 LLM 瞎猜季节
+  const month = new Date(Date.now() + 8 * 3600_000).getUTCMonth() + 1
+  const season = month <= 2 || month === 12 ? '冬' : month <= 5 ? '春' : month <= 8 ? '夏' : '秋'
+  const timeHint = `当前是${month}月，${season}季`
   const userPrompt = place
-    ? `图片版权信息：「${place}」。请基于其中的地点和当前季节，写一句中文短句。`
-    : '请写一句中文短句，贴合旅行/生活/自然的氛围，呼应当前季节。'
+    ? `图片版权信息：「${place}」。${timeHint}。请基于其中的地点和当前季节，写一句中文短句。`
+    : `${timeHint}。请写一句中文短句，贴合旅行/生活/自然的氛围，呼应当前季节。`
 
   let resp: Response
   try {
