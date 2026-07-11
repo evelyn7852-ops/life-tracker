@@ -5,10 +5,11 @@ import { HomeView } from './components/HomeView'
 import { MoodHeader } from './components/MoodHeader'
 import { QuickInput } from './components/QuickInput'
 import { TodayView } from './components/TodayView'
+import { TrainView } from './components/TrainView'
 import { WeekView } from './components/WeekView'
 import { flushOutbox } from './lib/outbox'
 
-type Tab = 'home' | 'today' | 'history' | 'week'
+type Tab = 'home' | 'today' | 'history' | 'week' | 'train'
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('home')
@@ -34,11 +35,12 @@ export default function App() {
           </div>
           <div hidden={tab !== 'history'}><HistoryView refreshKey={refreshKey} active={tab === 'history'} /></div>
           <div hidden={tab !== 'week'}><WeekView refreshKey={refreshKey} active={tab === 'week'} /></div>
+          <div hidden={tab !== 'train'}><TrainView refreshKey={refreshKey} active={tab === 'train'} /></div>
         </main>
         <nav className="tabs">
-          {(['home', 'today', 'history', 'week'] as Tab[]).map((t) => (
+          {(['home', 'today', 'history', 'week', 'train'] as Tab[]).map((t) => (
             <button key={t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
-              {{ home: '首页', today: '记录', history: '历史', week: '周览' }[t]}
+              {{ home: '首页', today: '记录', history: '历史', week: '周览', train: '训练' }[t]}
             </button>
           ))}
         </nav>

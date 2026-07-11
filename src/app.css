@@ -122,3 +122,17 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 @media (prefers-reduced-motion: reduce) {
   .dog-run, .dog-nap, .dog-eat, .dog-scratch, .dog-zzz { animation:none !important; }
 }
+
+.train-actions { display:flex; gap:8px; margin-top:8px; }
+.train-actions button { padding:6px 14px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
+.train-actions button.card-del { background:none; color:var(--muted); padding:6px 10px; }
+.train-schedule { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+.train-date-label { display:flex; flex-direction:column; gap:4px; font-size:13px; color:var(--muted); }
+.train-date-label input { padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+.train-block-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+.train-block-list li { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:14px; }
+.train-block-list button { border:none; background:none; color:var(--muted); padding:4px 8px; }
+.train-exercise-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+.train-exercise-item { width:100%; text-align:left; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--card); font-size:15px; }
+.train-exercise-detail ul { padding-left:18px; font-size:13px; line-height:1.7; }
+.train-exercise-detail a { display:inline-block; margin-top:8px; color:var(--accent); font-size:13px; }
