@@ -3,9 +3,23 @@ import { listEntries } from '../lib/entriesRepo'
 import { generateSummary, getSummary, type PeriodType, type Summary } from '../lib/summaryRepo'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
 
-function weekStart(): Date {
-  const d = new Date(); const day = (d.getDay() + 6) % 7 // 周一起
-  d.setDate(d.getDate() - day); d.setHours(0, 0, 0, 0); return d
+export function weekStart(d: Date = new Date()): Date {
+  const start = new Date(d)
+  start.setDate(start.getDate() - start.getDay()) // 周日起
+  start.setHours(0, 0, 0, 0)
+  return start
+}
+
+function toShortDateStr(d: Date): string {
+  return `${d.getMonth() + 1}月${d.getDate()}日`
+}
+
+/** 「7月5日–7月11日」 */
+export function weekRangeLabel(d: Date = new Date()): string {
+  const start = weekStart(d)
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  return `${toShortDateStr(start)}–${toShortDateStr(end)}`
 }
 
 function monthStart(): Date {
@@ -88,6 +102,7 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
 
   return (
     <div className="view">
+      <p className="view-title">周览 {weekRangeLabel()}</p>
       {loading && rows.length === 0 ? (
         <p className="muted empty">加载中…</p>
       ) : (

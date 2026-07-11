@@ -12,7 +12,34 @@ vi.mock('../lib/summaryRepo', () => ({
   generateSummary: (t: string, s: string, f: string, to: string) => generateSummaryMock(t, s, f, to),
 }))
 
-import { WeekView } from './WeekView'
+import { WeekView, weekStart, weekRangeLabel } from './WeekView'
+
+describe('weekStart 周日起始', () => {
+  it('2026-07-09（周四）→ 周起始为 2026-07-05（周日）', () => {
+    const start = weekStart(new Date(2026, 6, 9))
+    expect(start.getFullYear()).toBe(2026)
+    expect(start.getMonth()).toBe(6)
+    expect(start.getDate()).toBe(5)
+    expect(start.getDay()).toBe(0)
+  })
+
+  it('本身就是周日 → 周起始为当天', () => {
+    const start = weekStart(new Date(2026, 6, 5))
+    expect(start.getDate()).toBe(5)
+  })
+
+  it('归零时分秒', () => {
+    const start = weekStart(new Date(2026, 6, 9, 15, 30, 0))
+    expect(start.getHours()).toBe(0)
+    expect(start.getMinutes()).toBe(0)
+  })
+})
+
+describe('weekRangeLabel 范围标注', () => {
+  it('2026-07-09 所在周 → 「7月5日–7月11日」', () => {
+    expect(weekRangeLabel(new Date(2026, 6, 9))).toBe('7月5日–7月11日')
+  })
+})
 
 describe('WeekView AI 总结', () => {
   beforeEach(() => {
@@ -59,19 +86,19 @@ describe('WeekView AI 总结', () => {
     expect(Number.isNaN(Date.parse(fromTs))).toBe(false)
     expect(Number.isNaN(Date.parse(toTs))).toBe(false)
     expect(new Date(fromTs).getTime()).toBeLessThan(new Date(toTs).getTime())
-    // from_ts 是本地周一 00:00（非 UTC 解析的 period_start）
-    const localMonday = new Date()
-    localMonday.setDate(localMonday.getDate() - ((localMonday.getDay() + 6) % 7))
-    localMonday.setHours(0, 0, 0, 0)
-    expect(fromTs).toBe(localMonday.toISOString())
+    // from_ts 是本地周日 00:00（非 UTC 解析的 period_start）
+    const localSunday = new Date()
+    localSunday.setDate(localSunday.getDate() - localSunday.getDay())
+    localSunday.setHours(0, 0, 0, 0)
+    expect(fromTs).toBe(localSunday.toISOString())
     // period_start 仍是本地日期字符串（缓存键）
     expect(periodStartArg).toBe(
-      `${localMonday.getFullYear()}-${String(localMonday.getMonth() + 1).padStart(2, '0')}-${String(localMonday.getDate()).padStart(2, '0')}`,
+      `${localSunday.getFullYear()}-${String(localSunday.getMonth() + 1).padStart(2, '0')}-${String(localSunday.getDate()).padStart(2, '0')}`,
     )
-    // to_ts = 本地下周一 00:00
-    const localNextMonday = new Date(localMonday)
-    localNextMonday.setDate(localNextMonday.getDate() + 7)
-    expect(toTs).toBe(localNextMonday.toISOString())
+    // to_ts = 本地下周日 00:00
+    const localNextSunday = new Date(localSunday)
+    localNextSunday.setDate(localNextSunday.getDate() + 7)
+    expect(toTs).toBe(localNextSunday.toISOString())
   })
 
   it('切到本月 → 用 month 参数重新查询缓存', async () => {
