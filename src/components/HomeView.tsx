@@ -62,7 +62,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
       </div>
       <div className="home-quote-card">
         {sentence ? (
-          <p className="home-quote-text">{sentence}</p>
+          <p className="home-quote-text one-line">{sentence}</p>
         ) : (
           <>
             <p className="home-quote-text">{quote.text}</p>

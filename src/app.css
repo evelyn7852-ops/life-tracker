@@ -1,4 +1,4 @@
-:root { --bg:#faf9f5; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#c15f3c; --line:#e8e4da; --klein:#002FA5; }
+:root { --bg:#f6f8fe; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#2B5CE6; --line:#e3e8f8; --klein:#002FA5; }
 * { box-sizing:border-box; margin:0; }
 body { background:var(--bg); color:var(--ink); font-family:-apple-system,'PingFang SC',sans-serif; }
 button, .card-text, .day-dot { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
@@ -37,8 +37,8 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .card-edit input { flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; }
 .card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; padding:16px; margin:-16px; }
 .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-.dot-food{background:#d97706}.dot-workout{background:#c15f3c}.dot-travel{background:#0e7490}
-.dot-reading{background:#7c3aed}.dot-journal{background:#64748b}.dot-learning{background:#15803d}
+.dot-food{background:#FFB020}.dot-workout{background:#2B5CE6}.dot-travel{background:#00B8D9}
+.dot-reading{background:#9B51E0}.dot-journal{background:#7A869A}.dot-learning{background:#36B37E}
 .day-dots { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px; }
 .day-dot { font-size:12px; padding:4px 10px; border-radius:999px; border:1px dashed var(--line); color:var(--muted); }
 .day-dot.on { border-style:solid; color:var(--ink); }
@@ -52,7 +52,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .bar-n { width:24px; text-align:right; font-size:13px; color:var(--muted); }
 
 .home-view { align-items:center; padding-top:4px; }
-.home-image { width:100%; aspect-ratio:4/3; border-radius:16px; overflow:hidden; background:var(--klein); }
+.home-image { width:100%; aspect-ratio:4/3; border-radius:0; overflow:hidden; background:var(--klein); }
 .home-image img { width:100%; height:100%; object-fit:cover; display:block; }
 .home-image-fallback { background:var(--klein); }
 .home-copyright { font-size:11px; margin-top:4px; text-align:center; }
@@ -61,6 +61,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .home-view .mood-row { justify-content:center; }
 .home-quote-card { width:100%; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; text-align:center; }
 .home-quote-text { font-size:15px; line-height:1.7; }
+.home-quote-text.one-line { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:clamp(12px,4vw,15px); line-height:1.5; }
 .home-quote-author { margin-top:8px; font-size:12px; }
 
 .cal { width:100%; border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
