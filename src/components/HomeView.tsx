@@ -3,6 +3,7 @@ import { useMood } from '../hooks/useMood'
 import { fetchDailyImage, type DailyImage } from '../lib/dailyImage'
 import { todayQuote } from '../lib/quote'
 import { CalendarView } from './CalendarView'
+import { DogBanner } from './DogBanner'
 
 const MOODS = ['😊', '😐', '😮‍💨', '🥳', '😢', '🤒']
 const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六']
@@ -70,6 +71,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
         )}
       </div>
       <CalendarView active={active} />
+      <DogBanner />
     </div>
   )
 }

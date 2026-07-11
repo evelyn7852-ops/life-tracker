@@ -51,7 +51,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .bar { height:100%; border-radius:7px; }
 .bar-n { width:24px; text-align:right; font-size:13px; color:var(--muted); }
 
-.home-view { align-items:center; padding-top:4px; }
+.home-view { align-items:center; padding-top:4px; padding-bottom:60px; }
 .home-image { width:100%; aspect-ratio:4/3; border-radius:16px; overflow:hidden; background:var(--klein); }
 .home-image img { width:100%; height:100%; object-fit:cover; display:block; }
 .home-image-fallback { background:var(--klein); }
@@ -95,3 +95,30 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .summary-content p + p { margin-top:8px; }
 .summary-actions { margin-top:8px; }
 .summary-actions button, .summary-empty button { padding:8px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
+
+.dog-banner { position:fixed; left:0; right:0; bottom:50px; max-width:480px; margin:0 auto; height:56px; overflow:hidden; pointer-events:none; z-index:5; }
+.dog-banner-static { display:flex; align-items:center; justify-content:center; opacity:.8; }
+.dog { position:absolute; bottom:8px; left:45%; font-size:24px; line-height:1; display:inline-block; }
+.dog-sit { position:static; font-size:22px; }
+.dog-run { animation:dog-run 9s linear infinite; }
+.dog-nap { animation:dog-bob 3s ease-in-out infinite; opacity:.9; }
+.dog-eat { animation:dog-eat .6s ease-in-out infinite; }
+.dog-scratch { animation:dog-scratch .5s ease-in-out infinite; }
+.dog-zzz { position:absolute; top:-14px; right:-8px; font-size:11px; animation:dog-float 2.4s ease-in-out infinite; }
+.dog-bone { position:absolute; bottom:2px; right:-16px; font-size:13px; }
+
+@keyframes dog-run {
+  0%   { left:4%;  transform:scaleX(1); }
+  45%  { left:84%; transform:scaleX(1); }
+  50%  { left:84%; transform:scaleX(-1); }
+  95%  { left:4%;  transform:scaleX(-1); }
+  100% { left:4%;  transform:scaleX(1); }
+}
+@keyframes dog-bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
+@keyframes dog-eat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+@keyframes dog-scratch { 0%,100% { transform:rotate(0deg); } 25% { transform:rotate(-8deg); } 75% { transform:rotate(8deg); } }
+@keyframes dog-float { 0% { opacity:0; transform:translateY(0); } 40% { opacity:1; } 100% { opacity:0; transform:translateY(-10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dog-run, .dog-nap, .dog-eat, .dog-scratch, .dog-zzz { animation:none !important; }
+}

@@ -89,6 +89,11 @@ describe('HomeView', () => {
     expect(await screen.findByText(/——/)).toBeTruthy()
   })
 
+  it('渲染狗 banner', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(document.querySelector('.dog-banner')).toBeTruthy()
+  })
+
   it('点击 emoji（今日无已有心情）→ saveEntry 新建 journal mood 条', async () => {
     const onSaved = vi.fn()
     render(<HomeView refreshKey={0} onSaved={onSaved} active />)
