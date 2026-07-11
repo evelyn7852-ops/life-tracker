@@ -1,0 +1,274 @@
+[
+  {
+    "id": "push-day",
+    "name": "推日",
+    "style": "力量",
+    "notes": "力量三分化 · 推",
+    "blocks": [
+      {
+        "exerciseId": "bench-press",
+        "sets": 4,
+        "reps": 6,
+        "restSec": 120
+      },
+      {
+        "exerciseId": "incline-bench-press",
+        "sets": 3,
+        "reps": 8,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "overhead-press",
+        "sets": 3,
+        "reps": 8,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "db-shoulder-press",
+        "sets": 3,
+        "reps": 10,
+        "restSec": 60
+      },
+      {
+        "exerciseId": "triceps-pushdown",
+        "sets": 3,
+        "reps": 12,
+        "restSec": 60
+      }
+    ]
+  },
+  {
+    "id": "pull-day",
+    "name": "拉日",
+    "style": "力量",
+    "notes": "力量三分化 · 拉",
+    "blocks": [
+      {
+        "exerciseId": "deadlift",
+        "sets": 4,
+        "reps": 5,
+        "restSec": 150
+      },
+      {
+        "exerciseId": "pull-up",
+        "sets": 4,
+        "reps": 8,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "barbell-row",
+        "sets": 3,
+        "reps": 8,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "db-row",
+        "sets": 3,
+        "reps": 10,
+        "restSec": 60
+      },
+      {
+        "exerciseId": "db-bicep-curl",
+        "sets": 3,
+        "reps": 12,
+        "restSec": 60
+      }
+    ]
+  },
+  {
+    "id": "leg-day",
+    "name": "腿日",
+    "style": "力量",
+    "notes": "力量三分化 · 腿",
+    "blocks": [
+      {
+        "exerciseId": "back-squat",
+        "sets": 4,
+        "reps": 6,
+        "restSec": 150
+      },
+      {
+        "exerciseId": "rdl",
+        "sets": 3,
+        "reps": 8,
+        "restSec": 120
+      },
+      {
+        "exerciseId": "bulgarian-split-squat",
+        "sets": 3,
+        "reps": 10,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "leg-press",
+        "sets": 3,
+        "reps": 12,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "leg-curl",
+        "sets": 3,
+        "reps": 12,
+        "restSec": 60
+      }
+    ]
+  },
+  {
+    "id": "hyrox-simulation",
+    "name": "Hyrox 模拟",
+    "style": "hyrox",
+    "notes": "八站模拟，站间可穿插1km跑",
+    "blocks": [
+      {
+        "exerciseId": "skierg",
+        "distance": 1000,
+        "restSec": 60
+      },
+      {
+        "exerciseId": "sled-push",
+        "distance": 50,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "sled-pull",
+        "distance": 50,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "burpee-broad-jump",
+        "distance": 80,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "rowing-machine",
+        "distance": 1000,
+        "restSec": 60
+      },
+      {
+        "exerciseId": "farmers-carry",
+        "distance": 200,
+        "restSec": 60
+      },
+      {
+        "exerciseId": "sandbag-lunge",
+        "distance": 100,
+        "restSec": 90
+      },
+      {
+        "exerciseId": "wall-ball",
+        "reps": 100,
+        "restSec": 90
+      }
+    ]
+  },
+  {
+    "id": "crossfit-amrap",
+    "name": "CrossFit AMRAP",
+    "style": "crossfit",
+    "notes": "AMRAP 20分钟，尽可能多轮次",
+    "blocks": [
+      {
+        "exerciseId": "kettlebell-swing",
+        "reps": 15,
+        "restSec": 0
+      },
+      {
+        "exerciseId": "pull-up",
+        "reps": 10,
+        "restSec": 0
+      },
+      {
+        "exerciseId": "wall-ball",
+        "reps": 15,
+        "restSec": 0
+      }
+    ]
+  },
+  {
+    "id": "crossfit-emom",
+    "name": "CrossFit EMOM",
+    "style": "crossfit",
+    "notes": "EMOM 12分钟，3动作轮换，每轮1分钟",
+    "blocks": [
+      {
+        "exerciseId": "burpee-broad-jump",
+        "reps": 10,
+        "restSec": 0
+      },
+      {
+        "exerciseId": "kettlebell-swing",
+        "reps": 15,
+        "restSec": 0
+      },
+      {
+        "exerciseId": "plank",
+        "duration": 30,
+        "restSec": 0
+      }
+    ]
+  },
+  {
+    "id": "yoga-morning",
+    "name": "瑜伽流 · 晨间唤醒",
+    "style": "瑜伽",
+    "notes": "晨间流动，唤醒身体",
+    "blocks": [
+      {
+        "exerciseId": "cat-cow",
+        "duration": 60
+      },
+      {
+        "exerciseId": "downward-dog",
+        "duration": 60
+      },
+      {
+        "exerciseId": "warrior-1",
+        "duration": 45
+      },
+      {
+        "exerciseId": "warrior-2",
+        "duration": 45
+      },
+      {
+        "exerciseId": "triangle-pose",
+        "duration": 45
+      },
+      {
+        "exerciseId": "tree-pose",
+        "duration": 45
+      },
+      {
+        "exerciseId": "bridge-pose",
+        "duration": 45
+      }
+    ]
+  },
+  {
+    "id": "yoga-evening",
+    "name": "瑜伽流 · 睡前放松",
+    "style": "瑜伽",
+    "notes": "睡前舒缓，助眠放松",
+    "blocks": [
+      {
+        "exerciseId": "child-pose",
+        "duration": 60
+      },
+      {
+        "exerciseId": "cat-cow",
+        "duration": 45
+      },
+      {
+        "exerciseId": "pigeon-pose",
+        "duration": 60
+      },
+      {
+        "exerciseId": "bridge-pose",
+        "duration": 45
+      },
+      {
+        "exerciseId": "corpse-pose",
+        "duration": 120
+      }
+    ]
+  }
+]

@@ -1,0 +1,858 @@
+[
+  {
+    "id": "back-squat",
+    "name": "高杠深蹲",
+    "muscles": [
+      "股四头肌",
+      "臀大肌",
+      "竖脊肌"
+    ],
+    "cues": [
+      "脚与肩同宽、脚尖微外展",
+      "下蹲时膝盖与脚尖方向一致",
+      "核心收紧、腰背保持中立",
+      "髋膝同时启动下降至大腿低于水平",
+      "杠铃杆置于肩胛中部承重"
+    ],
+    "mistakes": [
+      "膝内扣",
+      "重心前移脚跟离地",
+      "下背过度弓起或圆背"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E9%AB%98%E6%9D%A0%E6%B7%B1%E8%B9%B2%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "front-squat",
+    "name": "前蹲",
+    "muscles": [
+      "股四头肌",
+      "核心",
+      "上背"
+    ],
+    "cues": [
+      "杠铃置于前三角肌+锁骨支撑",
+      "肘部尽量抬高与地面平行",
+      "核心高度收紧维持躯干直立",
+      "下蹲到位后髋膝同时发力起立"
+    ],
+    "mistakes": [
+      "肘部下垂导致杠铃前滑",
+      "躯干过度前倾",
+      "下蹲幅度不足"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%89%8D%E8%B9%B2%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "deadlift",
+    "name": "传统硬拉",
+    "muscles": [
+      "竖脊肌",
+      "臀大肌",
+      "腘绳肌",
+      "背阔肌"
+    ],
+    "cues": [
+      "杠铃贴近胫骨、脚踩杠铃正下方",
+      "启动前收紧背部维持中立脊柱",
+      "用髋部发力而非纯用背部拉起",
+      "杠铃贴身走直线路径",
+      "锁定时挺髋不过度后仰"
+    ],
+    "mistakes": [
+      "圆背拉起",
+      "杠铃远离身体导致杠杆过长",
+      "起身瞬间过度后仰腰椎"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E4%BC%A0%E7%BB%9F%E7%A1%AC%E6%8B%89%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "rdl",
+    "name": "罗马尼亚硬拉",
+    "muscles": [
+      "腘绳肌",
+      "臀大肌",
+      "竖脊肌"
+    ],
+    "cues": [
+      "膝盖微屈、髋部主导后推",
+      "杠铃贴腿下滑至小腿中段感受腘绳肌拉伸",
+      "背部全程中立不圆背",
+      "用臀部收缩带动起身"
+    ],
+    "mistakes": [
+      "膝盖过度弯曲变成深蹲",
+      "下背圆背代偿",
+      "下放幅度过大导致腰椎代偿"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E7%BD%97%E9%A9%AC%E5%B0%BC%E4%BA%9A%E7%A1%AC%E6%8B%89%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "bench-press",
+    "name": "杠铃卧推",
+    "muscles": [
+      "胸大肌",
+      "三角肌前束",
+      "肱三头肌"
+    ],
+    "cues": [
+      "肩胛下沉后收固定在卧推凳上",
+      "握距略宽于肩、手腕保持中立",
+      "杠铃下放至胸口乳头连线附近",
+      "下放时肘部约45度、避免完全外展",
+      "推起路径微向头侧倾斜"
+    ],
+    "mistakes": [
+      "肩胛未固定导致肩部代偿",
+      "杠铃触胸后弹震",
+      "臀部离开凳面"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%9D%A0%E9%93%83%E5%8D%A7%E6%8E%A8%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "incline-bench-press",
+    "name": "上斜卧推",
+    "muscles": [
+      "胸大肌上部",
+      "三角肌前束"
+    ],
+    "cues": [
+      "凳面倾角30-45度",
+      "杠铃下放至锁骨下方胸口",
+      "肩胛依旧下沉后收",
+      "避免角度过大变成推举"
+    ],
+    "mistakes": [
+      "倾角过高导致三角肌代偿过多",
+      "下放位置过高触及颈部",
+      "核心松弛导致腰部代偿"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E4%B8%8A%E6%96%9C%E5%8D%A7%E6%8E%A8%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "overhead-press",
+    "name": "站姿推举",
+    "muscles": [
+      "三角肌",
+      "肱三头肌",
+      "核心"
+    ],
+    "cues": [
+      "站姿与肩同宽、核心收紧臀部夹紧",
+      "杠铃从锁骨位置垂直推起",
+      "头部在杠铃过额头时微让位后归位",
+      "锁定时耸肩夹紧上背"
+    ],
+    "mistakes": [
+      "过度后仰腰椎代偿",
+      "推举路径前后摆动",
+      "核心未收紧导致骨盆前倾"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E7%AB%99%E5%A7%BF%E6%8E%A8%E4%B8%BE%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "db-shoulder-press",
+    "name": "哑铃推举",
+    "muscles": [
+      "三角肌",
+      "肱三头肌"
+    ],
+    "cues": [
+      "坐姿或站姿核心收紧",
+      "哑铃从耳侧高度推起至锁定",
+      "下放至肘略低于肩水平",
+      "手腕保持中立不过度后屈"
+    ],
+    "mistakes": [
+      "哑铃路径前后不稳",
+      "下放幅度过浅",
+      "借助腰腹弹震发力"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%93%91%E9%93%83%E6%8E%A8%E4%B8%BE%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "barbell-row",
+    "name": "杠铃划船",
+    "muscles": [
+      "背阔肌",
+      "斜方肌中束",
+      "菱形肌"
+    ],
+    "cues": [
+      "髋部铰链前倾约45-70度、背部中立",
+      "杠铃从地面或悬垂位拉向下腹",
+      "肩胛主动内收带动手臂",
+      "下放控制不甩动"
+    ],
+    "mistakes": [
+      "用惯性甩动躯干代偿",
+      "圆背拉起",
+      "肩胛未参与仅靠手臂拉"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%9D%A0%E9%93%83%E5%88%92%E8%88%B9%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "db-row",
+    "name": "哑铃单臂划船",
+    "muscles": [
+      "背阔肌",
+      "斜方肌",
+      "肱二头肌"
+    ],
+    "cues": [
+      "单膝手撑凳保持躯干平行地面",
+      "哑铃拉向髋侧、肘部贴近身体",
+      "顶点主动挤压肩胛",
+      "下放至手臂完全伸直"
+    ],
+    "mistakes": [
+      "躯干旋转借力",
+      "拉起时耸肩代替背部发力",
+      "活动幅度不完整"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%93%91%E9%93%83%E5%8D%95%E8%87%82%E5%88%92%E8%88%B9%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "pull-up",
+    "name": "引体向上",
+    "muscles": [
+      "背阔肌",
+      "肱二头肌",
+      "核心"
+    ],
+    "cues": [
+      "正手宽握、起始悬垂肩胛下沉",
+      "下拉时想象把胸口引向杠铃",
+      "下降至手臂完全伸直控制不掉落",
+      "避免摆荡借力"
+    ],
+    "mistakes": [
+      "用下肢/腰部甩动借力",
+      "幅度不完整（未到下巴过杆）",
+      "肩胛未参与纯靠手臂"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%BC%95%E4%BD%93%E5%90%91%E4%B8%8A%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "chin-up",
+    "name": "反手引体",
+    "muscles": [
+      "背阔肌",
+      "肱二头肌"
+    ],
+    "cues": [
+      "反手窄握、掌心朝内",
+      "启动时肩胛下沉后收",
+      "下巴过杆顶点挤压背部",
+      "下降全程控制"
+    ],
+    "mistakes": [
+      "借力摆荡",
+      "活动幅度不足",
+      "肘部过度外展"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%8F%8D%E6%89%8B%E5%BC%95%E4%BD%93%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "壶铃摇摆",
+    "muscles": [
+      "臀大肌",
+      "腘绳肌",
+      "核心"
+    ],
+    "cues": [
+      "髋部铰链后推壶铃至腿间",
+      "用髋部爆发力将壶铃摆至胸口高度",
+      "手臂仅作引导不主动上举",
+      "顶点挺髋收紧臀部"
+    ],
+    "mistakes": [
+      "用手臂力量上举代替髋部发力",
+      "深蹲代替髋铰链",
+      "腰背圆背"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%A3%B6%E9%93%83%E6%91%87%E6%91%86%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "farmers-carry",
+    "name": "农夫行走",
+    "muscles": [
+      "前臂",
+      "斜方肌",
+      "核心"
+    ],
+    "cues": [
+      "双手各持一重物、肩胛下沉挺胸",
+      "步伐稳定、核心收紧保持躯干直立",
+      "避免左右晃动或耸肩"
+    ],
+    "mistakes": [
+      "耸肩导致斜方肌代偿",
+      "躯干侧倾晃动",
+      "步伐过大失去控制"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%86%9C%E5%A4%AB%E8%A1%8C%E8%B5%B0%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "bulgarian-split-squat",
+    "name": "保加利亚分腿蹲",
+    "muscles": [
+      "股四头肌",
+      "臀大肌"
+    ],
+    "cues": [
+      "后脚置于凳上、前脚距凳约一步半",
+      "下蹲至前腿大腿接近水平",
+      "重心保持在前脚、躯干微前倾"
+    ],
+    "mistakes": [
+      "前脚距离过近导致膝盖前移过多",
+      "重心不稳晃动",
+      "下蹲幅度不足"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E4%BF%9D%E5%8A%A0%E5%88%A9%E4%BA%9A%E5%88%86%E8%85%BF%E8%B9%B2%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "lunge",
+    "name": "箭步蹲",
+    "muscles": [
+      "股四头肌",
+      "臀大肌"
+    ],
+    "cues": [
+      "迈步后前膝与脚尖同向",
+      "后膝接近地面但不触地",
+      "躯干保持直立核心收紧",
+      "蹬地回到起始位"
+    ],
+    "mistakes": [
+      "前膝内扣或过度前移超过脚尖",
+      "步幅过小导致重心不稳",
+      "躯干过度前倾"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E7%AE%AD%E6%AD%A5%E8%B9%B2%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "hip-thrust",
+    "name": "臀桥",
+    "muscles": [
+      "臀大肌",
+      "腘绳肌"
+    ],
+    "cues": [
+      "上背靠稳凳边、杠铃置于髋部",
+      "下颌微收、肋骨下沉避免过度后仰",
+      "顶点挺髋夹臀、膝踝对齐",
+      "下放控制不冲击"
+    ],
+    "mistakes": [
+      "顶点过度后仰腰椎代偿",
+      "下颌上扬颈椎受压",
+      "下放速度过快失控"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E8%87%80%E6%A1%A5%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "plank",
+    "name": "平板支撑",
+    "muscles": [
+      "核心",
+      "肩部稳定肌群"
+    ],
+    "cues": [
+      "肘部垫地与肩同宽、身体呈一条直线",
+      "收紧腹部与臀部避免塌腰",
+      "目视地面保持颈椎中立"
+    ],
+    "mistakes": [
+      "塌腰或翘臀破坏直线",
+      "耸肩导致肩部代偿",
+      "憋气未正常呼吸"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%B9%B3%E6%9D%BF%E6%94%AF%E6%92%91%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "hanging-leg-raise",
+    "name": "悬垂举腿",
+    "muscles": [
+      "腹直肌",
+      "髂腰肌"
+    ],
+    "cues": [
+      "悬垂握杆、肩胛下沉稳定",
+      "用下腹发力将双腿抬起至水平以上",
+      "下放控制避免摆荡"
+    ],
+    "mistakes": [
+      "借助摆荡惯性完成动作",
+      "仅靠髋屈肌未激活下腹",
+      "下放速度过快"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%82%AC%E5%9E%82%E4%B8%BE%E8%85%BF%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "db-bicep-curl",
+    "name": "哑铃弯举",
+    "muscles": [
+      "肱二头肌"
+    ],
+    "cues": [
+      "上臂固定贴近身体、肘部不前后摆动",
+      "匀速弯举至顶点挤压肱二头肌",
+      "下放全程控制"
+    ],
+    "mistakes": [
+      "借助身体摆动甩举",
+      "肘部前移变成推举轨迹",
+      "下放过快失去张力"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%93%91%E9%93%83%E5%BC%AF%E4%B8%BE%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "triceps-pushdown",
+    "name": "绳索下压",
+    "muscles": [
+      "肱三头肌"
+    ],
+    "cues": [
+      "上臂贴紧体侧固定、仅前臂发力下压",
+      "顶点完全伸直并停顿挤压",
+      "上放控制不超过90度过多"
+    ],
+    "mistakes": [
+      "借助身体前倾发力",
+      "上臂晃动脱离固定",
+      "下压不完全伸直"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E7%BB%B3%E7%B4%A2%E4%B8%8B%E5%8E%8B%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "seated-cable-row",
+    "name": "坐姿划船机",
+    "muscles": [
+      "背阔肌",
+      "斜方肌中束",
+      "菱形肌"
+    ],
+    "cues": [
+      "挺胸坐直、膝盖微屈脚踩踏板",
+      "拉柄至上腹、肩胛主动内收",
+      "下放伸展背部但不圆背"
+    ],
+    "mistakes": [
+      "躯干前后摆动借力",
+      "耸肩代替背部发力",
+      "活动幅度过短"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%9D%90%E5%A7%BF%E5%88%92%E8%88%B9%E6%9C%BA%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "高位下拉",
+    "muscles": [
+      "背阔肌",
+      "肱二头肌"
+    ],
+    "cues": [
+      "宽握、躯干微后倾稳定",
+      "下拉至锁骨上方、肩胛下沉后收",
+      "上放控制手臂完全伸展"
+    ],
+    "mistakes": [
+      "过度后仰借力",
+      "仅用手臂力量未激活背阔肌",
+      "下拉幅度过低至胸腹"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E9%AB%98%E4%BD%8D%E4%B8%8B%E6%8B%89%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "leg-press",
+    "name": "腿举",
+    "muscles": [
+      "股四头肌",
+      "臀大肌"
+    ],
+    "cues": [
+      "双脚与肩同宽置于踏板中部",
+      "下放至膝关节约90度、腰背贴紧靠垫",
+      "蹬起时膝盖不完全锁死"
+    ],
+    "mistakes": [
+      "下放幅度过大导致腰部离开靠垫",
+      "膝盖内扣",
+      "蹬起时膝关节过度锁死冲击关节"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E8%85%BF%E4%B8%BE%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "leg-extension",
+    "name": "腿屈伸",
+    "muscles": [
+      "股四头肌"
+    ],
+    "cues": [
+      "靠垫贴合小腿下方、背部贴紧椅背",
+      "伸展至顶点停顿挤压股四头肌",
+      "下放控制不甩动"
+    ],
+    "mistakes": [
+      "甩动惯性完成动作",
+      "顶点过度锁死冲击膝关节",
+      "活动幅度不完整"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E8%85%BF%E5%B1%88%E4%BC%B8%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "leg-curl",
+    "name": "腿弯举",
+    "muscles": [
+      "腘绳肌"
+    ],
+    "cues": [
+      "俯卧或坐姿固定髋部",
+      "屈膝拉动靠垫至最大幅度并停顿",
+      "下放全程控制"
+    ],
+    "mistakes": [
+      "借助臀部抬起代偿",
+      "甩动完成动作",
+      "活动幅度不足"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E8%85%BF%E5%BC%AF%E4%B8%BE%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "skierg",
+    "name": "SkiErg划雪橇机",
+    "muscles": [
+      "背阔肌",
+      "肱三头肌",
+      "核心"
+    ],
+    "cues": [
+      "双手握把、髋部铰链前倾下拉",
+      "核心收紧带动上肢下拉发力",
+      "上拉时手臂放松回到起始位",
+      "保持稳定节奏而非爆发单次"
+    ],
+    "mistakes": [
+      "仅用手臂力量未启动髋部核心",
+      "节奏过快导致动作变形",
+      "躯干过度前倾失去张力"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=SkiErg%E5%88%92%E9%9B%AA%E6%A9%87%E6%9C%BA%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "sled-push",
+    "name": "推雪橇",
+    "muscles": [
+      "股四头肌",
+      "臀大肌",
+      "核心"
+    ],
+    "cues": [
+      "手臂伸直、躯干前倾45度左右推把手",
+      "步伐小而快、脚掌全程发力蹬地",
+      "核心收紧保持躯干稳定"
+    ],
+    "mistakes": [
+      "躯干过度直立导致推力不足",
+      "步伐过大失去控制",
+      "耸肩借助上肢代偿"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%8E%A8%E9%9B%AA%E6%A9%87%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "sled-pull",
+    "name": "拉雪橇",
+    "muscles": [
+      "背阔肌",
+      "腘绳肌",
+      "前臂"
+    ],
+    "cues": [
+      "面朝雪橇后退拉绳或正面手过手拉动",
+      "核心收紧、髋部主导发力",
+      "保持稳定步伐节奏"
+    ],
+    "mistakes": [
+      "仅用手臂拉动未启动全身",
+      "躯干旋转借力",
+      "步伐不稳导致节奏中断"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%8B%89%E9%9B%AA%E6%A9%87%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "burpee-broad-jump",
+    "name": "波比跳远",
+    "muscles": [
+      "全身",
+      "核心",
+      "股四头肌"
+    ],
+    "cues": [
+      "下蹲手撑地、双脚后跳成俯卧撑姿",
+      "完成一次俯卧撑或胸触地后跳回蹲姿",
+      "起身后立即向前跳远衔接下一次"
+    ],
+    "mistakes": [
+      "俯卧撑幅度不足",
+      "落地缓冲不足膝盖受伤风险",
+      "节奏过快导致动作变形"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%B3%A2%E6%AF%94%E8%B7%B3%E8%BF%9C%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "rowing-machine",
+    "name": "划船机",
+    "muscles": [
+      "背阔肌",
+      "股四头肌",
+      "核心"
+    ],
+    "cues": [
+      "腿-躯干-手臂顺序发力拉动（先蹬腿再后仰躯干再拉手）",
+      "回程手臂-躯干-腿依次归位",
+      "核心全程收紧保持躯干稳定"
+    ],
+    "mistakes": [
+      "过早用手臂拉动未先蹬腿",
+      "躯干后仰过度腰椎代偿",
+      "回程节奏过快失去控制"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%88%92%E8%88%B9%E6%9C%BA%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "sandbag-lunge",
+    "name": "沙袋弓步",
+    "muscles": [
+      "股四头肌",
+      "臀大肌",
+      "核心"
+    ],
+    "cues": [
+      "沙袋置于肩上或抱于胸前、核心收紧",
+      "弓步下蹲时前膝与脚尖同向",
+      "步伐稳定匀速前进"
+    ],
+    "mistakes": [
+      "沙袋位置不稳导致躯干晃动",
+      "前膝过度前移超过脚尖",
+      "步幅不一致节奏混乱"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%B2%99%E8%A2%8B%E5%BC%93%E6%AD%A5%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "wall-ball",
+    "name": "墙球",
+    "muscles": [
+      "股四头肌",
+      "肩部",
+      "核心"
+    ],
+    "cues": [
+      "深蹲蓄力、起身时借助腿部爆发力将球推向墙靶",
+      "接球时缓冲回到深蹲姿势衔接下一次",
+      "核心全程收紧"
+    ],
+    "mistakes": [
+      "仅用手臂力量未借助腿部爆发",
+      "深蹲幅度不足",
+      "接球时手臂僵硬未缓冲"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%A2%99%E7%90%83%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "downward-dog",
+    "name": "下犬式",
+    "muscles": [
+      "腘绳肌",
+      "肩部",
+      "小腿"
+    ],
+    "cues": [
+      "双手与肩同宽、双脚与髋同宽撑地成倒V字",
+      "坐骨向上向后延展、脚跟尽量下沉",
+      "肩胛下沉远离耳朵、脊柱延展"
+    ],
+    "mistakes": [
+      "圆背耸肩",
+      "膝盖过度弯曲导致臀部抬不高",
+      "手腕承重过多未分散到全身"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E4%B8%8B%E7%8A%AC%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "warrior-1",
+    "name": "战士一式",
+    "muscles": [
+      "股四头肌",
+      "髋屈肌",
+      "肩部"
+    ],
+    "cues": [
+      "前腿屈膝呈90度、后腿蹬直脚跟稳定着地",
+      "髋部尽量正对前方",
+      "双臂向上伸展、肩胛下沉"
+    ],
+    "mistakes": [
+      "后脚跟离地失去稳定",
+      "髋部未摆正侧向偏移",
+      "前膝超过脚尖过多"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%88%98%E5%A3%AB%E4%B8%80%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "warrior-2",
+    "name": "战士二式",
+    "muscles": [
+      "股四头肌",
+      "髋部",
+      "核心"
+    ],
+    "cues": [
+      "前腿屈膝90度、后腿蹬直脚掌外侧贴地",
+      "双臂侧平举、目视前方中指方向",
+      "髋部与肩部保持在同一侧向平面"
+    ],
+    "mistakes": [
+      "前膝内扣",
+      "躯干前倾偏离中立",
+      "后脚外侧未贴地失去支撑"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%88%98%E5%A3%AB%E4%BA%8C%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "triangle-pose",
+    "name": "三角式",
+    "muscles": [
+      "腘绳肌",
+      "腰侧",
+      "髋部"
+    ],
+    "cues": [
+      "双脚分开一腿长、前脚朝前后脚外展90度",
+      "髋部侧移躯干向前腿延展、下手轻触小腿或地面",
+      "上手向上伸展、双肩在一条直线上"
+    ],
+    "mistakes": [
+      "躯干前倾而非侧向延展",
+      "膝盖弯曲失去腘绳肌拉伸",
+      "肩部旋转不足身体正面朝下"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E4%B8%89%E8%A7%92%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "tree-pose",
+    "name": "树式",
+    "muscles": [
+      "核心",
+      "踝部稳定肌群"
+    ],
+    "cues": [
+      "单脚站稳、另一脚掌贴内侧大腿或小腿（避开膝盖）",
+      "核心收紧、髋部保持中正",
+      "双手合十胸前或上举、目视一点稳定平衡"
+    ],
+    "mistakes": [
+      "脚掌抵住膝盖侧面增加受伤风险",
+      "髋部歪斜代偿",
+      "核心松弛导致晃动"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%A0%91%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "pigeon-pose",
+    "name": "鸽子式",
+    "muscles": [
+      "臀部",
+      "髋屈肌"
+    ],
+    "cues": [
+      "前腿屈膝外旋置于身前、后腿向后伸直",
+      "髋部尽量摆正朝前",
+      "可俯身前屈加深髋部拉伸、避免压迫膝关节"
+    ],
+    "mistakes": [
+      "前脚过度靠近髋部增加膝盖压力",
+      "髋部歪斜一侧抬起",
+      "强行下压忽略疼痛信号"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E9%B8%BD%E5%AD%90%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "child-pose",
+    "name": "婴儿式",
+    "muscles": [
+      "下背",
+      "髋部"
+    ],
+    "cues": [
+      "跪坐脚跟、膝盖分开或并拢，躯干前屈额头触地",
+      "双臂向前伸展或放于体侧放松",
+      "呼吸深长放松肩颈"
+    ],
+    "mistakes": [
+      "强行下压引发不适",
+      "肩部耸起未放松",
+      "呼吸急促未配合动作放松"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E5%A9%B4%E5%84%BF%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "bridge-pose",
+    "name": "桥式",
+    "muscles": [
+      "臀大肌",
+      "竖脊肌",
+      "腘绳肌"
+    ],
+    "cues": [
+      "仰卧屈膝、脚跟靠近臀部与肩同宽",
+      "挺髋抬起臀部、肩部与双脚支撑地面",
+      "核心与臀部收紧避免腰椎过度受力"
+    ],
+    "mistakes": [
+      "双脚距臀部过远导致膝盖前移过多",
+      "颈部过度转动受压",
+      "腰椎过度前弓代偿"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%A1%A5%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "cat-cow",
+    "name": "猫牛式",
+    "muscles": [
+      "脊柱",
+      "核心"
+    ],
+    "cues": [
+      "四点跪姿、吸气塌腰抬头成牛式，呼气拱背低头成猫式",
+      "动作配合呼吸节奏缓慢流动",
+      "手掌与膝盖始终稳定支撑"
+    ],
+    "mistakes": [
+      "动作过快未配合呼吸",
+      "手腕未正对肩部下方受压",
+      "颈部过度后仰或低头"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E7%8C%AB%E7%89%9B%E5%BC%8F%E6%95%99%E5%AD%A6"
+  },
+  {
+    "id": "corpse-pose",
+    "name": "摊尸式",
+    "muscles": [
+      "全身放松"
+    ],
+    "cues": [
+      "仰卧、四肢自然摊开掌心向上",
+      "闭眼放松面部与肩颈",
+      "专注呼吸让全身逐步放松"
+    ],
+    "mistakes": [
+      "无法放松身体持续紧绷",
+      "呼吸浅短未深长放松",
+      "提前起身未给身体恢复时间"
+    ],
+    "videoUrl": "https://search.bilibili.com/all?keyword=%E6%91%8A%E5%B0%B8%E5%BC%8F%E6%95%99%E5%AD%A6"
+  }
+]
