@@ -62,6 +62,29 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .home-quote-text { font-size:15px; line-height:1.7; }
 .home-quote-author { margin-top:8px; font-size:12px; }
 
+.cal { width:100%; border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
+.cal-head { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:8px; }
+.cal-head button { font-size:18px; color:var(--muted); background:none; border:none; padding:4px 10px; }
+.cal-title { font-size:14px; font-weight:600; min-width:88px; text-align:center; }
+.cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); font-size:11px; color:var(--muted); text-align:center; margin-bottom:2px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-day { position:relative; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; background:none; border:none; border-radius:10px; font-size:13px; color:var(--ink); }
+.cal-day.today { background:var(--card); border:1px solid var(--accent); font-weight:700; }
+.cal-day-out { color:var(--line); }
+.cal-emoji { position:absolute; top:1px; right:3px; font-size:9px; line-height:1; }
+.cal-day-num { line-height:1.1; }
+.cal-dots { display:flex; gap:2px; align-items:center; }
+.cal-dots .dot { width:5px; height:5px; }
+.cal-dot-overflow { font-size:8px; color:var(--muted); }
+
+.day-detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:flex-end; justify-content:center; z-index:20; }
+.day-detail-sheet { width:100%; max-width:480px; max-height:80dvh; overflow-y:auto; background:var(--bg); border-radius:20px 20px 0 0; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.day-detail-head { display:flex; align-items:center; gap:10px; }
+.day-detail-head button { font-size:18px; background:none; border:none; color:var(--muted); padding:4px 8px; }
+.day-detail-title { flex:1; text-align:center; font-size:15px; font-weight:600; }
+.day-detail-close { font-size:15px !important; }
+.day-detail-body { display:flex; flex-direction:column; gap:8px; }
+
 .summary-section { border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
 .section-title { font-size:13px; font-weight:600; margin-bottom:8px; }
 .summary-tabs { display:flex; gap:8px; margin-bottom:8px; }

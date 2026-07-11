@@ -3,7 +3,7 @@ import { deleteEntry, updateEntry } from '../lib/entriesRepo'
 import { parseEntry } from '../lib/parser'
 import { DOMAIN_LABEL, type Entry } from '../lib/types'
 
-export function EntryCard({ entry, onChanged }: { entry: Entry; onChanged: () => void }) {
+export function EntryCard({ entry, onChanged, readOnly }: { entry: Entry; onChanged: () => void; readOnly?: boolean }) {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState(entry.raw_text)
 
@@ -35,9 +35,9 @@ export function EntryCard({ entry, onChanged }: { entry: Entry; onChanged: () =>
           <button onClick={() => setEditing(false)}>取消</button>
         </div>
       ) : (
-        <p className="card-text" onClick={() => setEditing(true)}>{entry.raw_text}</p>
+        <p className="card-text" onClick={() => !readOnly && setEditing(true)}>{entry.raw_text}</p>
       )}
-      <button className="card-del" onClick={remove}>删</button>
+      {!readOnly && <button className="card-del" onClick={remove}>删</button>}
     </div>
   )
 }

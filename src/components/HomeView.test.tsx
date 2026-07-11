@@ -30,6 +30,17 @@ describe('HomeView', () => {
     expect(await screen.findByText(/月.*日.*周/)).toBeTruthy()
   })
 
+  it('大日期含年份', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(await screen.findByText(/\d{4}年\d{1,2}月\d{1,2}日 周[日一二三四五六]/)).toBeTruthy()
+  })
+
+  it('渲染月历（含当月标题）', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    const now = new Date()
+    expect(await screen.findByText(`${now.getFullYear()}年${now.getMonth() + 1}月`)).toBeTruthy()
+  })
+
   it('渲染每日一句（含出处）', async () => {
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     expect(await screen.findByText(/——/)).toBeTruthy()

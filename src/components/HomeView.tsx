@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useMood } from '../hooks/useMood'
 import { fetchDailyImage, type DailyImage } from '../lib/dailyImage'
 import { todayQuote } from '../lib/quote'
+import { CalendarView } from './CalendarView'
 
 const MOODS = ['😊', '😐', '😮‍💨', '🥳', '😢', '🤒']
 const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六']
 
 function formatBigDate(d: Date): string {
-  return `${d.getMonth() + 1}月${d.getDate()}日 周${WEEKDAY_ZH[d.getDay()]}`
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 周${WEEKDAY_ZH[d.getDay()]}`
 }
 
 function formatClock(d: Date): string {
@@ -60,6 +61,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
         <p className="home-quote-text">{quote.text}</p>
         <p className="home-quote-author muted">—— {quote.author}</p>
       </div>
+      <CalendarView active={active} />
     </div>
   )
 }
