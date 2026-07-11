@@ -62,12 +62,31 @@ describe('HomeView', () => {
   })
 
   it('图片获取成功 → 渲染 img', async () => {
-    fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: 'c' })
+    fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: 'c', sentence: null })
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     await waitFor(() => {
       const img = document.querySelector('.home-image img')
       expect(img).toBeTruthy()
     })
+  })
+
+  it('图片含地点（copyright）→ 图片下方显示地点原文', async () => {
+    fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: '在沙巴的水稻田，老街，越南', sentence: null })
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(await screen.findByText('在沙巴的水稻田，老街，越南')).toBeTruthy()
+  })
+
+  it('daily-image 返回地点化 sentence → 显示该句，不显示语录出处', async () => {
+    fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: 'c', sentence: '稻浪起伏处，是异乡也是归途。' })
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(await screen.findByText('稻浪起伏处，是异乡也是归途。')).toBeTruthy()
+    expect(screen.queryByText(/——/)).toBeNull()
+  })
+
+  it('sentence 为 null（LLM 失败/离线）→ 降级为语录库（含出处）', async () => {
+    fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: 'c', sentence: null })
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(await screen.findByText(/——/)).toBeTruthy()
   })
 
   it('点击 emoji（今日无已有心情）→ saveEntry 新建 journal mood 条', async () => {

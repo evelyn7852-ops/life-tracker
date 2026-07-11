@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-export interface DailyImage { url: string; copyright: string }
+export interface DailyImage { url: string; copyright: string; sentence: string | null }
 
 function todayKey(d = new Date()): string {
   const y = d.getFullYear()
@@ -34,7 +34,11 @@ export async function fetchDailyImage(): Promise<DailyImage | null> {
   try {
     const { data, error } = await supabase.functions.invoke('daily-image', { method: 'GET' })
     if (error || typeof data?.url !== 'string') return null
-    const image: DailyImage = { url: data.url, copyright: typeof data.copyright === 'string' ? data.copyright : '' }
+    const image: DailyImage = {
+      url: data.url,
+      copyright: typeof data.copyright === 'string' ? data.copyright : '',
+      sentence: typeof data.sentence === 'string' && data.sentence.trim() ? data.sentence : null,
+    }
     writeCache(key, image)
     return image
   } catch {

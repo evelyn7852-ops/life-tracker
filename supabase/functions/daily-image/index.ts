@@ -3,6 +3,60 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 // Bing 每日一图（中国站）。经服务端代理是因为浏览器直取有 CORS 墙。
 const BING_URL = 'https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN'
 
+// Same provider defaults as summarize/parse-entry — see those files for why these are pinned.
+const DEFAULT_LLM_BASE_URL = 'https://apihub.agnes-ai.com/v1'
+const DEFAULT_LLM_MODEL = 'agnes-2.0-flash'
+
+const SENTENCE_SYSTEM = '你是一个旅行随笔作者。只输出一句中文短句，不超过40个字；不要加引号、不要署名、不要引用他人诗句或格言（避免杜撰出处）；语气贴近旅行/生活/自然，与地点或当前季节呼应。直接输出正文，不要任何解释或标点前后缀。'
+
+/** 基于 Bing 图片版权信息（含地点）请求 LLM 生成一句地点化短句；失败/未配置时返回 null，调用方降级为语录库。 */
+async function generateSentence(copyright: string): Promise<string | null> {
+  const apiKey = Deno.env.get('LLM_API_KEY')
+  if (!apiKey) return null
+  const baseUrl = Deno.env.get('LLM_BASE_URL') ?? DEFAULT_LLM_BASE_URL
+  const model = Deno.env.get('LLM_MODEL') ?? DEFAULT_LLM_MODEL
+
+  const place = copyright.trim()
+  const userPrompt = place
+    ? `图片版权信息：「${place}」。请基于其中的地点和当前季节，写一句中文短句。`
+    : '请写一句中文短句，贴合旅行/生活/自然的氛围，呼应当前季节。'
+
+  let resp: Response
+  try {
+    resp = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: SENTENCE_SYSTEM },
+          { role: 'user', content: userPrompt },
+        ],
+        max_tokens: 100,
+        temperature: 0.8,
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
+  } catch {
+    return null
+  }
+  if (!resp.ok) return null
+
+  try {
+    const respBody = await resp.json()
+    let content = String(respBody.choices[0].message.content).trim()
+    content = content.replace(/^[「"'“」]+|[」"'”「]+$/g, '').trim()
+    if (!content) return null
+    if (content.length > 40) content = content.slice(0, 40)
+    return content
+  } catch {
+    return null
+  }
+}
+
 Deno.serve(async (req) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -35,8 +89,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'bing returned no image' }), { status: 502, headers: cors })
   }
   const copyright = typeof first?.copyright === 'string' ? first.copyright : ''
+  const sentence = await generateSentence(copyright)
 
-  return new Response(JSON.stringify({ url: `https://cn.bing.com${urlPath}`, copyright }), {
+  return new Response(JSON.stringify({ url: `https://cn.bing.com${urlPath}`, copyright, sentence }), {
     headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
   })
 })

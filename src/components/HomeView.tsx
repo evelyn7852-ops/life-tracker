@@ -36,6 +36,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
   }, [active])
 
   const showFallback = !image
+  const sentence = image?.sentence
 
   return (
     <div className="view home-view">
@@ -44,6 +45,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
           <img src={image!.url} alt={image!.copyright} onError={() => setImage(null)} />
         )}
       </div>
+      {!showFallback && image!.copyright && <p className="home-copyright muted">{image!.copyright}</p>}
       <p className="home-date">{formatBigDate(now)}</p>
       <p className="home-clock muted">{formatClock(now)}</p>
       <div className="mood-row">
@@ -58,8 +60,14 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
         ))}
       </div>
       <div className="home-quote-card">
-        <p className="home-quote-text">{quote.text}</p>
-        <p className="home-quote-author muted">—— {quote.author}</p>
+        {sentence ? (
+          <p className="home-quote-text">{sentence}</p>
+        ) : (
+          <>
+            <p className="home-quote-text">{quote.text}</p>
+            <p className="home-quote-author muted">—— {quote.author}</p>
+          </>
+        )}
       </div>
       <CalendarView active={active} />
     </div>

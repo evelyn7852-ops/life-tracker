@@ -55,6 +55,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .home-image { width:100%; aspect-ratio:4/3; border-radius:16px; overflow:hidden; background:var(--klein); }
 .home-image img { width:100%; height:100%; object-fit:cover; display:block; }
 .home-image-fallback { background:var(--klein); }
+.home-copyright { font-size:11px; margin-top:4px; text-align:center; }
 .home-date { font-size:26px; font-weight:700; margin-top:6px; }
 .home-clock { margin-top:-6px; }
 .home-view .mood-row { justify-content:center; }
