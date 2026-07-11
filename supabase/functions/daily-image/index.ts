@@ -42,7 +42,7 @@ async function generateSentence(copyright: string): Promise<string | null> {
         max_tokens: 100,
         temperature: 0.8,
       }),
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(20000),
     })
   } catch {
     return null
@@ -93,7 +93,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'bing returned no image' }), { status: 502, headers: cors })
   }
   const copyright = typeof first?.copyright === 'string' ? first.copyright : ''
-  const sentence = await generateSentence(copyright)
+  // ?fast=1：跳过 LLM 立刻回图（客户端两段式加载，句子随后单独取）
+  const fast = new URL(req.url).searchParams.get('fast') === '1'
+  const sentence = fast ? null : await generateSentence(copyright)
 
   return new Response(JSON.stringify({ url: `https://cn.bing.com${urlPath}`, copyright, sentence }), {
     headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },

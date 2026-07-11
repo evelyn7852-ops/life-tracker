@@ -25,23 +25,47 @@ function writeCache(key: string, image: DailyImage): void {
   try { localStorage.setItem(key, JSON.stringify(image)) } catch { /* storage full/unavailable — ignore */ }
 }
 
-/** 每日一图：先查本地缓存，未命中则调用 Edge Function；失败/离线返回 null（调用方降级为纯色块）。 */
-export async function fetchDailyImage(): Promise<DailyImage | null> {
+function normalize(data: unknown): DailyImage | null {
+  const d = data as { url?: unknown; copyright?: unknown; sentence?: unknown } | null
+  if (typeof d?.url !== 'string') return null
+  return {
+    url: d.url,
+    copyright: typeof d.copyright === 'string' ? d.copyright : '',
+    sentence: typeof d.sentence === 'string' && d.sentence.trim() ? d.sentence : null,
+  }
+}
+
+async function invoke(fast: boolean): Promise<DailyImage | null> {
+  try {
+    const name = fast ? 'daily-image?fast=1' : 'daily-image'
+    const { data, error } = await supabase.functions.invoke(name, { method: 'GET' })
+    if (error) return null
+    return normalize(data)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 每日一图，两段式：缓存命中直接回；否则先 fast 调用秒回图（sentence null），
+ * 再后台取完整版，句子到位后经 onUpdate 通知并落一整天缓存。
+ * 失败/离线返回 null（调用方降级为纯色块 + 语录库）。
+ */
+export async function fetchDailyImage(onUpdate?: (img: DailyImage) => void): Promise<DailyImage | null> {
   const key = todayKey()
   const cached = readCache(key)
   if (cached) return cached
 
-  try {
-    const { data, error } = await supabase.functions.invoke('daily-image', { method: 'GET' })
-    if (error || typeof data?.url !== 'string') return null
-    const image: DailyImage = {
-      url: data.url,
-      copyright: typeof data.copyright === 'string' ? data.copyright : '',
-      sentence: typeof data.sentence === 'string' && data.sentence.trim() ? data.sentence : null,
+  const fast = await invoke(true)
+  if (!fast) return null
+
+  // 句子后台补齐；LLM 偶发失败时不落缓存，下次打开重试
+  void invoke(false).then((full) => {
+    if (full?.sentence) {
+      writeCache(key, full)
+      onUpdate?.(full)
     }
-    writeCache(key, image)
-    return image
-  } catch {
-    return null
-  }
+  })
+
+  return fast
 }

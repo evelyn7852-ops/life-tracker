@@ -32,7 +32,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
   useEffect(() => {
     if (!active) return
     let cancelled = false
-    fetchDailyImage().then((img) => { if (!cancelled) setImage(img) })
+    fetchDailyImage((full) => { if (!cancelled) setImage(full) }).then((img) => { if (!cancelled) setImage(img) })
     return () => { cancelled = true }
   }, [active])
 

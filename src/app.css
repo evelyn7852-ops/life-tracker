@@ -51,7 +51,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .bar { height:100%; border-radius:7px; }
 .bar-n { width:24px; text-align:right; font-size:13px; color:var(--muted); }
 
-.home-view { align-items:center; padding-top:4px; padding-bottom:60px; }
+.home-view { align-items:center; padding-top:4px; }
 .home-image { width:100%; aspect-ratio:4/3; border-radius:16px; overflow:hidden; background:var(--klein); }
 .home-image img { width:100%; height:100%; object-fit:cover; display:block; }
 .home-image-fallback { background:var(--klein); }
@@ -96,7 +96,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .summary-actions { margin-top:8px; }
 .summary-actions button, .summary-empty button { padding:8px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
 
-.dog-banner { position:fixed; left:0; right:0; bottom:50px; max-width:480px; margin:0 auto; height:56px; overflow:hidden; pointer-events:none; z-index:5; }
+.dog-banner { position:relative; width:100%; height:56px; overflow:hidden; pointer-events:none; margin-top:4px; }
 .dog-banner-static { display:flex; align-items:center; justify-content:center; opacity:.8; }
 .dog { position:absolute; bottom:8px; left:45%; font-size:24px; line-height:1; display:inline-block; }
 .dog-sit { position:static; font-size:22px; }
