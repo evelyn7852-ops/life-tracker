@@ -13,6 +13,11 @@ vi.mock('../lib/workoutRepo', () => ({
   archiveWorkout: (w: unknown) => archiveWorkoutMock(w),
 }))
 
+const generateWorkoutMock = vi.fn()
+vi.mock('../lib/generateWorkout', () => ({
+  generateWorkout: (direction: unknown, date: unknown, recent: unknown) => generateWorkoutMock(direction, date, recent),
+}))
+
 import { TrainView } from './TrainView'
 import type { Workout } from '../lib/types'
 
@@ -35,6 +40,7 @@ beforeEach(() => {
   insertWorkoutMock.mockReset().mockResolvedValue({ ...plannedWorkout })
   deleteWorkoutMock.mockReset().mockResolvedValue(undefined)
   archiveWorkoutMock.mockReset().mockResolvedValue({ ...plannedWorkout, status: 'done' })
+  generateWorkoutMock.mockReset()
   vi.spyOn(window, 'confirm').mockReturnValue(true)
 })
 afterEach(() => vi.restoreAllMocks())
@@ -116,19 +122,82 @@ describe('TrainView 课表库', () => {
 })
 
 describe('TrainView 动作库', () => {
-  it('切到动作库 → 展示动作列表', async () => {
+  it('切到动作库 → 按分类分组，默认全部折叠', async () => {
     render(<TrainView refreshKey={0} active />)
     await userEvent.click(screen.getByText('动作库'))
+    expect(await screen.findByText('力量')).toBeTruthy()
+    expect(screen.getByText('Hyrox')).toBeTruthy()
+    expect(screen.queryByText('高杠深蹲')).toBeNull()
+  })
+
+  it('点开分类板块 → 展示该分类下动作列表', async () => {
+    render(<TrainView refreshKey={0} active />)
+    await userEvent.click(screen.getByText('动作库'))
+    await userEvent.click(await screen.findByText('力量'))
     expect(await screen.findByText('高杠深蹲')).toBeTruthy()
+    expect(screen.queryByText('SkiErg划雪橇机')).toBeNull()
   })
 
   it('点击动作 → 展示详情（肌群/要点/常见错误/视频外链）', async () => {
     render(<TrainView refreshKey={0} active />)
     await userEvent.click(screen.getByText('动作库'))
+    await userEvent.click(await screen.findByText('力量'))
     await userEvent.click(await screen.findByText('高杠深蹲'))
     expect(await screen.findByText(/股四头肌/)).toBeTruthy()
     const link = screen.getByText('观看教学视频') as HTMLAnchorElement
     expect(link.target).toBe('_blank')
     expect(link.href).toContain('bilibili.com')
+  })
+})
+
+describe('TrainView 一键生成', () => {
+  it('今日计划空态 → 展示三个生成按钮', async () => {
+    render(<TrainView refreshKey={0} active />)
+    expect(await screen.findByText('生成 Hyrox')).toBeTruthy()
+    expect(screen.getByText('生成 CrossFit')).toBeTruthy()
+    expect(screen.getByText('生成力量')).toBeTruthy()
+  })
+
+  it('点击生成 → busy 态展示"生成中…"，调用 generateWorkout 带方向/日期/近14天摘要', async () => {
+    listWorkoutsMock.mockResolvedValue([])
+    generateWorkoutMock.mockImplementation(() => new Promise(() => {}))
+    render(<TrainView refreshKey={0} active />)
+    await screen.findByText('生成 Hyrox')
+    await userEvent.click(screen.getByText('生成 Hyrox'))
+    expect(await screen.findByText('生成中…')).toBeTruthy()
+    await waitFor(() => expect(generateWorkoutMock).toHaveBeenCalledWith('hyrox', expect.any(String), expect.any(Array)))
+  })
+
+  it('生成成功 → 草稿进入可编辑排课界面，确认后调用 insertWorkout（template_id 为 null）', async () => {
+    generateWorkoutMock.mockResolvedValue({
+      title: 'Hyrox 生成计划',
+      blocks: [
+        { exerciseId: 'skierg', distance: 1000, restSec: 60 },
+        { exerciseId: 'wall-ball', reps: 20, restSec: 60 },
+        { exerciseId: 'burpee-broad-jump', distance: 80, restSec: 90 },
+      ],
+    })
+    render(<TrainView refreshKey={0} active />)
+    await screen.findByText('生成 Hyrox')
+    await userEvent.click(screen.getByText('生成 Hyrox'))
+    expect(await screen.findByText('Hyrox 生成计划')).toBeTruthy()
+    const today = new Date().toISOString().slice(0, 10)
+    expect((screen.getByLabelText('日期') as HTMLInputElement).value).toBe(today)
+    await userEvent.click(screen.getByText('确认排课'))
+    await waitFor(() => expect(insertWorkoutMock).toHaveBeenCalled())
+    const payload = insertWorkoutMock.mock.calls[0][0]
+    expect(payload.title).toBe('Hyrox 生成计划')
+    expect(payload.template_id).toBeNull()
+    expect(payload.status).toBe('planned')
+    expect(payload.blocks.length).toBe(3)
+  })
+
+  it('生成失败 → 展示中文错误提示，不调用 insertWorkout', async () => {
+    generateWorkoutMock.mockRejectedValue(new Error('生成失败，请重试'))
+    render(<TrainView refreshKey={0} active />)
+    await screen.findByText('生成 Hyrox')
+    await userEvent.click(screen.getByText('生成 Hyrox'))
+    expect(await screen.findByText('生成失败，请重试')).toBeTruthy()
+    expect(insertWorkoutMock).not.toHaveBeenCalled()
   })
 })

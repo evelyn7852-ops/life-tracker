@@ -1,16 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import exercisesData from '../data/exercises.json'
 import templatesData from '../data/workoutTemplates.json'
+import { generateWorkout, type GenerateDirection } from '../lib/generateWorkout'
 import { archiveWorkout, deleteWorkout, insertWorkout, listWorkouts } from '../lib/workoutRepo'
-import type { Exercise, Workout, WorkoutBlock, WorkoutTemplate } from '../lib/types'
+import type { Exercise, ExerciseCategory, Workout, WorkoutBlock, WorkoutTemplate } from '../lib/types'
 
 const exercises = exercisesData as Exercise[]
 const templates = templatesData as WorkoutTemplate[]
 const exerciseName = (id: string): string => exercises.find((e) => e.id === id)?.name ?? id
 
-function todayStr(): string {
-  const d = new Date()
+function dateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function todayStr(): string {
+  return dateStr(new Date())
+}
+
+function daysAgoStr(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return dateStr(d)
 }
 
 function blockLabel(b: WorkoutBlock): string {
@@ -24,14 +34,82 @@ function blockLabel(b: WorkoutBlock): string {
 
 type Section = 'today' | 'library' | 'exercises'
 
-function TodayPlan({ rows, loading, onArchive, onDelete }: {
+const GENERATE_DIRECTIONS: { key: GenerateDirection; label: string }[] = [
+  { key: 'hyrox', label: '生成 Hyrox' },
+  { key: 'crossfit', label: '生成 CrossFit' },
+  { key: '力量', label: '生成力量' },
+]
+
+function buildRecent(rows: Workout[]): { date: string; title: string; exerciseIds: string[] }[] {
+  return rows.map((w) => ({ date: w.date, title: w.title, exerciseIds: w.blocks.map((b) => b.exerciseId) }))
+}
+
+function GenerateEmptyState({ onScheduled }: { onScheduled: () => void }) {
+  const [busy, setBusy] = useState<GenerateDirection | null>(null)
+  const [draft, setDraft] = useState<{ title: string; blocks: WorkoutBlock[] } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleGenerate = async (direction: GenerateDirection) => {
+    setBusy(direction)
+    setError(null)
+    try {
+      const today = todayStr()
+      const recentRows = await listWorkouts({ fromDate: daysAgoStr(14), toDate: today })
+      const result = await generateWorkout(direction, today, buildRecent(recentRows))
+      setDraft(result)
+    } catch {
+      setError('生成失败，请重试')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const confirm = async (date: string, blocks: WorkoutBlock[]) => {
+    if (!draft) return
+    await insertWorkout({ date, template_id: null, title: draft.title, blocks, status: 'planned', performed: null })
+    setDraft(null)
+    onScheduled()
+  }
+
+  if (draft) {
+    return (
+      <div className="card">
+        <div className="card-head">
+          <span className="card-domain">{draft.title}</span>
+        </div>
+        <ScheduleForm initialBlocks={draft.blocks} onCancel={() => setDraft(null)} onConfirm={confirm} />
+      </div>
+    )
+  }
+
+  return (
+    <div className="train-generate">
+      <div className="train-actions">
+        {GENERATE_DIRECTIONS.map((d) => (
+          <button key={d.key} onClick={() => handleGenerate(d.key)} disabled={busy !== null}>
+            {busy === d.key ? '生成中…' : d.label}
+          </button>
+        ))}
+      </div>
+      {error && <p className="muted">{error}</p>}
+    </div>
+  )
+}
+
+function TodayPlan({ rows, loading, onArchive, onDelete, onScheduled }: {
   rows: Workout[]; loading: boolean
   onArchive: (w: Workout) => void; onDelete: (id: string) => void
+  onScheduled: () => void
 }) {
   return (
     <div className="view">
       {loading && rows.length === 0 && <p className="muted empty">加载中…</p>}
-      {!loading && rows.length === 0 && <p className="muted empty">今天还没有排课，去课表库选一个吧</p>}
+      {!loading && rows.length === 0 && (
+        <>
+          <p className="muted empty">今天还没有排课，去课表库选一个吧</p>
+          <GenerateEmptyState onScheduled={onScheduled} />
+        </>
+      )}
       {rows.map((w) => (
         <div key={w.id} className="card">
           <div className="card-head">
@@ -51,13 +129,13 @@ function TodayPlan({ rows, loading, onArchive, onDelete }: {
   )
 }
 
-function ScheduleForm({ template, onCancel, onConfirm }: {
-  template: WorkoutTemplate
+function ScheduleForm({ initialBlocks, onCancel, onConfirm }: {
+  initialBlocks: WorkoutBlock[]
   onCancel: () => void
   onConfirm: (date: string, blocks: WorkoutBlock[]) => void
 }) {
   const [date, setDate] = useState(todayStr())
-  const [blocks, setBlocks] = useState<WorkoutBlock[]>(template.blocks)
+  const [blocks, setBlocks] = useState<WorkoutBlock[]>(initialBlocks)
 
   const removeBlock = (i: number) => setBlocks((bs) => bs.filter((_, idx) => idx !== i))
 
@@ -110,7 +188,7 @@ function TemplateLibrary({ onScheduled }: { onScheduled: () => void }) {
           <p className="card-text">{t.blocks.map(blockLabel).join('，')}</p>
           {schedulingId === t.id ? (
             <ScheduleForm
-              template={t}
+              initialBlocks={t.blocks}
               onCancel={() => setSchedulingId(null)}
               onConfirm={(date, blocks) => confirm(t, date, blocks)}
             />
@@ -125,17 +203,38 @@ function TemplateLibrary({ onScheduled }: { onScheduled: () => void }) {
   )
 }
 
+const EXERCISE_CATEGORIES: ExerciseCategory[] = ['力量', 'Hyrox']
+
 function ExerciseLibrary() {
   const [selected, setSelected] = useState<Exercise | null>(null)
+  const [openCategory, setOpenCategory] = useState<ExerciseCategory | null>(null)
   return (
     <div className="view">
-      <ul className="train-exercise-list">
-        {exercises.map((e) => (
-          <li key={e.id}>
-            <button className="train-exercise-item" onClick={() => setSelected(e)}>{e.name}</button>
-          </li>
-        ))}
-      </ul>
+      {EXERCISE_CATEGORIES.map((cat) => {
+        const items = exercises.filter((e) => e.category === cat)
+        const open = openCategory === cat
+        return (
+          <div key={cat} className="card train-accordion">
+            <button
+              className="train-accordion-head"
+              aria-expanded={open}
+              onClick={() => setOpenCategory(open ? null : cat)}
+            >
+              <span className="card-domain">{cat}</span>
+              <span className="muted">{open ? '收起' : `展开（${items.length}）`}</span>
+            </button>
+            {open && (
+              <ul className="train-exercise-list">
+                {items.map((e) => (
+                  <li key={e.id}>
+                    <button className="train-exercise-item" onClick={() => setSelected(e)}>{e.name}</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )
+      })}
       {selected && (
         <div className="card train-exercise-detail">
           <div className="card-head">
@@ -187,7 +286,7 @@ export function TrainView({ refreshKey, active }: { refreshKey: number; active: 
         <button className={section === 'exercises' ? 'on' : ''} onClick={() => setSection('exercises')}>动作库</button>
       </div>
       {section === 'today' && (
-        <TodayPlan rows={rows} loading={loading} onArchive={handleArchive} onDelete={handleDelete} />
+        <TodayPlan rows={rows} loading={loading} onArchive={handleArchive} onDelete={handleDelete} onScheduled={load} />
       )}
       {section === 'library' && <TemplateLibrary onScheduled={load} />}
       {section === 'exercises' && <ExerciseLibrary />}

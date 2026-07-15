@@ -34,9 +34,12 @@ export const ALL_DOMAINS: Domain[] = ['food','workout','travel','reading','journ
 
 // ---- 运动模块（W1）----
 
+export type ExerciseCategory = '力量' | 'Hyrox'
+
 export interface Exercise {
   id: string
   name: string
+  category: ExerciseCategory
   muscles: string[]
   cues: string[]
   mistakes: string[]

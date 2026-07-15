@@ -137,3 +137,9 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .train-exercise-item { width:100%; text-align:left; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--card); font-size:15px; }
 .train-exercise-detail ul { padding-left:18px; font-size:13px; line-height:1.7; }
 .train-exercise-detail a { display:inline-block; margin-top:8px; color:var(--accent); font-size:13px; }
+.train-accordion { padding:0; overflow:hidden; }
+.train-accordion-head { width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:none; background:none; text-align:left; font-size:15px; }
+.train-accordion .train-exercise-list { padding:0 10px 10px; }
+.train-accordion .train-exercise-item { border-color:transparent; background:var(--bg); }
+.train-generate { margin-top:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.train-generate .train-actions { flex-wrap:wrap; justify-content:center; }
