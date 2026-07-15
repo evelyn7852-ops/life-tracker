@@ -1,0 +1,353 @@
+{
+  "setup": [
+    "建一个专用项目文件夹,只把这个文件夹授权给 Claude(这是你的安全边界)",
+    "用 /init 生成 CLAUDE.md,再手动精简——每行问\"删了它会犯错吗?\"不会就删",
+    "把\"常驻规则\"放 CLAUDE.md,\"按需流程\"做成 Skill(别把该做 Skill 的塞进 CLAUDE.md)",
+    "在 Cowork 设置里写 Global Instructions:identity(你是谁)/ voice(你怎么写)/ 禁用词 三个文件",
+    "每条 workstream 一个 Project(各自 instructions/files/memory,不串味)",
+    "委托时描述 end state + 把它猜不到的都给它,而不是给一堆步骤",
+    "为每个 agent 定一个 verifier(核对清单/人读一遍),别信它自己说的\"done\"",
+    "把\"每周竞品 + 政策扫描\"设成 Scheduled task / Routine"
+  ],
+  "phases": [
+    {
+      "phase": "Phase 1 · 定义问题(PRD 前半)",
+      "p": 1,
+      "takeaways": [
+        "我能一句话说清 agent 的心智模型(它会规划 → 用工具 → 迭代)",
+        "我能不提 AI,只讲用户为什么痛 + 代价,写出问题陈述",
+        "我能说清目标用户是谁、在什么场景用",
+        "我知道 Chat / Cowork / Claude Code 各自什么时候用",
+        "我建好了专用文件夹 + 第一版 CLAUDE.md + Global Instructions"
+      ],
+      "weeks": [
+        {
+          "n": 1,
+          "title": "打地基 + 写问题陈述",
+          "theme": "先想清楚 agent 是什么,再把用户痛点写清楚",
+          "prd": "PRD §1–2 概述 + 问题陈述",
+          "learn": [
+            {
+              "t": "Claude 101 + AI 能力与边界(Academy)",
+              "pill": "free",
+              "link": "https://anthropic.skilljar.com/"
+            },
+            {
+              "t": "必读《Building Effective Agents》",
+              "pill": "read",
+              "link": "https://www.anthropic.com/engineering/building-effective-agents"
+            },
+            {
+              "t": "Reforge:问题陈述别提 AI(Zoom 范例)",
+              "pill": "read",
+              "link": "https://www.reforge.com/guides/write-a-prd-for-a-generative-ai-feature"
+            }
+          ],
+          "build": [
+            {
+              "t": "用你一个真实痛点写第一版问题陈述(不提 AI:用户为什么痛、代价多大)",
+              "out": "产出:问题陈述 + 一句话北极星"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:PRD §1–2 初稿"
+            }
+          ],
+          "cs": {
+            "you": "把\"CRPA 情报散落、RM 反应慢\"写成不提 AI 的痛点陈述",
+            "ref": "LORE(GitLab AI 黑客松 2026 冠军)",
+            "link": "https://about.gitlab.com/blog/gitlab-ai-hackathon-2026-meet-the-winners/",
+            "desc": "解决\"工程师离职带走脑中知识\"。评委:像产品不像黑客松项目。学它把问题定义到直击要害。",
+            "src": "GitLab Blog"
+          }
+        },
+        {
+          "n": 2,
+          "title": "Cowork 上手 + 定用户与场景",
+          "theme": "在真实文件上跑 agent,顺手搭好环境",
+          "prd": "PRD §3 目标用户 + 环境搭建",
+          "learn": [
+            {
+              "t": "Claude Code 101 + Cowork 入门(Academy)",
+              "pill": "free",
+              "link": "https://anthropic.skilljar.com/"
+            },
+            {
+              "t": "Cowork 入门:文件夹/Projects/CLAUDE.md",
+              "pill": "read",
+              "link": "https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork"
+            }
+          ],
+          "build": [
+            {
+              "t": "照§02-C 清单搭好环境;用 Cowork 读 3 份集采/指南 PDF → 条款对比表",
+              "out": "产出:目标用户画像 + 专用文件夹 + CLAUDE.md + 首个 task loop"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:PRD §3 + 环境搭好"
+            }
+          ],
+          "cs": {
+            "you": "定义用户:区域 KAM/MSL,场景=每周竞品与政策扫描",
+            "ref": "Cart-to-Kitchen 助手(Google GKE 冠军 Amie Wei)",
+            "link": "https://cloud.google.com/blog/topics/developers-practitioners/winners-and-highlights-from-gke-hackathon",
+            "desc": "分析购物车 → 推荐晚餐。范围小到极致却夺冠。学它:用户与场景越具体越好。",
+            "src": "Google Cloud Blog"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "Phase 2 · 设计方案(Skill,低代码甜区)",
+      "p": 2,
+      "takeaways": [
+        "我能从零写一个能稳定触发的 SKILL.md(description 是触发器,不是摘要)",
+        "我知道什么该进 CLAUDE.md(常驻)、什么该做成 Skill(按需)",
+        "我能定义可量化的成功指标(不是\"提升效率\")",
+        "我能写出 user story + 验收标准(\"什么算做对了\")",
+        "我的多个 skill 能组合调用"
+      ],
+      "weeks": [
+        {
+          "n": 3,
+          "title": "第一个 Skill + 写成功指标",
+          "theme": "把框架变成能力,并定义怎么算成功",
+          "prd": "PRD §4 目标与成功指标",
+          "learn": [
+            {
+              "t": "Introduction to Agent Skills(Academy)",
+              "pill": "free",
+              "link": "https://anthropic.skilljar.com/introduction-to-agent-skills"
+            },
+            {
+              "t": "ideaplan:AI PRD 的评估标准段",
+              "pill": "read",
+              "link": "https://www.ideaplan.io/blog/how-to-write-prd-for-ai-features"
+            }
+          ],
+          "build": [
+            {
+              "t": "用 skill-creator 写「余量价值分析」skill,同步定义成功指标",
+              "out": "产出:按 准入×处方×支付 打分出 slide 骨架 + 可量化评估标准"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:第 1 个稳定触发的 skill + PRD §4"
+            }
+          ],
+          "cs": {
+            "you": "成功指标定成\"3 分钟出威胁矩阵、vs 人工准确率≥90%\"",
+            "ref": "GEO Command Center / 竞品 battlecard(lablab.ai)",
+            "link": "https://lablab.ai/apps/recent-winners",
+            "desc": "输出\"可见度分数 + 引用缺口 + 建议\",而非一堆文字。学它:输出是可量化决策物。",
+            "src": "lablab.ai"
+          }
+        },
+        {
+          "n": 4,
+          "title": "扩成 Skill 库 + 写验收标准",
+          "theme": "3 个 skill 协同,定义什么算做对了",
+          "prd": "PRD §5–6 范围 + 用户故事/验收",
+          "learn": [
+            {
+              "t": "Skill 撰写最佳实践(docs)",
+              "pill": "read",
+              "link": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"
+            },
+            {
+              "t": "照抄 anthropics/skills 范例结构",
+              "pill": "read",
+              "link": "https://github.com/anthropics/skills"
+            }
+          ],
+          "build": [
+            {
+              "t": "再做 2 个:「Harvey ball 威胁矩阵」+「六层话术生成」skill,写 user stories + 验收",
+              "out": "产出:3-skill 库 + \"做对了\"标准 + 范围(含不做什么)"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:3-skill 库 + PRD §5–6"
+            }
+          ],
+          "cs": {
+            "you": "用户故事:\"作为 KAM,一句话拿到某院威胁矩阵\",验收=覆盖 4 类竞品",
+            "ref": "DebateGab(Dust AI 黑客松)",
+            "link": "https://dust.tt/blog/ai-agents-hackathon-winners",
+            "desc": "AI 给辩论实时反馈练 argumentation,跟你 MR 话术训练同构。学它:练技能+即时反馈做成闭环。",
+            "src": "Dust Blog"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "Phase 3 · 技术方案 + 护栏(MCP/Code)",
+      "p": 3,
+      "takeaways": [
+        "我能说清 MCP 三原语(tools/resources/prompts)和它解决什么",
+        "我搭出过一个最小可用的 MCP server",
+        "我知道 subagent 什么时候用(context 隔离/并行),会用 Explore/Plan",
+        "我理解 context→harness→loop 四层,能说清\"eval/reward 是我的护城河\"",
+        "我为 agent 写了失败模式(检测/用户看到/恢复)和护栏(自主级别)"
+      ],
+      "weeks": [
+        {
+          "n": 5,
+          "title": "MCP + 写技术方案段",
+          "theme": "让 agent 读真实数据,写清架构与数据源",
+          "prd": "PRD 技术方案 · 数据/MCP/模型策略",
+          "learn": [
+            {
+              "t": "Introduction to MCP(Academy,Python)",
+              "pill": "py",
+              "link": "https://anthropic.skilljar.com/introduction-to-model-context-protocol"
+            },
+            {
+              "t": "DeepLearning.AI《MCP: Build Rich-Context AI Apps》",
+              "pill": "free",
+              "link": "https://www.deeplearning.ai/courses/mcp-build-rich-context-ai-apps-with-anthropic"
+            }
+          ],
+          "build": [
+            {
+              "t": "先用已连的 GDrive/Gmail MCP 做一个真实动作;再用 FastMCP + Inspector 搭最小 server 包住抗感染 RSS 源",
+              "out": "产出:自建 MCP server + PRD 技术方案段(数据流图)"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:最小可用 MCP server + PRD 技术方案"
+            }
+          ],
+          "cs": {
+            "you": "技术方案:RSS+指南 → MCP → skill 打分 → 结构化情报",
+            "ref": "MR Compliance Auditor / Hearsay(lablab.ai)",
+            "link": "https://lablab.ai/apps/recent-winners",
+            "desc": "监控 125 个监管机构×67 法域,变化映射到控制项并 AI 解释。几乎是你 VBP/集采监控的翻版。",
+            "src": "lablab.ai"
+          }
+        },
+        {
+          "n": 6,
+          "title": "Code+Subagent + 写失败模式与护栏",
+          "theme": "端到端跑通,补上最加分的 AI 专属段",
+          "prd": "PRD §11–12 失败模式 + 护栏 ★",
+          "learn": [
+            {
+              "t": "Claude Code in Action + Subagents(Academy)",
+              "pill": "free",
+              "link": "https://anthropic.skilljar.com/claude-code-in-action"
+            },
+            {
+              "t": "ideaplan:失败模式 + 行为约束段",
+              "pill": "read",
+              "link": "https://www.ideaplan.io/blog/how-to-write-prd-for-ai-features"
+            }
+          ],
+          "build": [
+            {
+              "t": "用 subagent 做多源并行监控,串通 skill+MCP;每个失败模式写\"检测/用户看到/恢复\",定义护栏",
+              "out": "产出:端到端 agent + PRD 最加分的失败模式与护栏段"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:端到端 agent + PRD §11–12"
+            }
+          ],
+          "cs": {
+            "you": "护栏:情报只做\"draft 供人核\",不自动外发;来源必须可溯",
+            "ref": "Gitdefender(GitLab 冠军 · Google Cloud 大奖)",
+            "link": "https://about.gitlab.com/blog/gitlab-ai-hackathon-2026-meet-the-winners/",
+            "desc": "code review 里自动找+修漏洞、自开 review,无需人介入。学它:把 agent 自主边界定义清楚。",
+            "src": "GitLab Blog"
+          }
+        }
+      ]
+    },
+    {
+      "phase": "Phase 4 · 钉死 PRD + 预演",
+      "p": 4,
+      "takeaways": [
+        "我有一份完整的 12 段 PRD",
+        "我能用 PRD 驱动 Claude Code 建出 MVP",
+        "我能一句话讲清价值(为 X 用户把 Y 从 N 压到 M)",
+        "我能在 6–8h 内重建一个 scoped 版(手速练到位)",
+        "我知道 Codex 是什么,答得上评委"
+      ],
+      "weeks": [
+        {
+          "n": 7,
+          "title": "完成完整 PRD + PRD 驱动建 MVP",
+          "theme": "12 段 PRD 补齐,再用它驱动 Claude Code",
+          "prd": "PRD 全文定稿(8 通用 + 4 AI)",
+          "learn": [
+            {
+              "t": "Miqdad Jaffer(OpenAI)AI PRD 模板通读",
+              "pill": "read",
+              "link": "https://www.productcompass.pm/p/ai-prd-template"
+            },
+            {
+              "t": "认知 OpenAI Codex 是什么(答评委)",
+              "pill": "read",
+              "link": "https://openai.com/codex"
+            }
+          ],
+          "build": [
+            {
+              "t": "补齐 PRD 全 12 段,选定 capstone,用\"PRD 驱动开发\"让 Claude Code 建 MVP",
+              "out": "产出:一份完善 PRD + 它驱动出的可跑 MVP"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:完整 PRD + Capstone MVP"
+            }
+          ],
+          "cs": {
+            "you": "把 PRD 当\"行为契约\"喂给 Claude Code,MVP 一次成型",
+            "ref": "Miqdad Jaffer 的 AI PRD 模板(OpenAI)",
+            "link": "https://www.productcompass.pm/p/ai-prd-template",
+            "desc": "\"AI PRD 不是功能规格,是行为契约\"。拿它的段落骨架套你的项目。",
+            "src": "Product Compass"
+          }
+        },
+        {
+          "n": 8,
+          "title": "预演 + Pitch 打磨",
+          "theme": "练手速,把 PRD 浓缩成 3 分钟(你的强项)",
+          "prd": "PRD → 3 分钟 pitch",
+          "learn": [
+            {
+              "t": "复盘全流程,整理可复用模板",
+              "pill": "read"
+            }
+          ],
+          "build": [
+            {
+              "t": "限时 mock hackathon:6–8h 重建 scoped 版;把 PRD 浓缩成 3 分钟 demo/pitch",
+              "out": "产出:比赛肌肉记忆 + 一段有量化影响的 pitch"
+            }
+          ],
+          "ship": [
+            {
+              "t": "交付:完整 capstone + demo 脚本 + 可复用模板包"
+            }
+          ],
+          "cs": {
+            "you": "一句话讲清价值:为 X 类用户,把 Y 从 N 小时压到 M 分钟",
+            "ref": "Luna / \"headache saver\"(Milan AI Week · Dust)",
+            "link": "https://lablab.ai/apps/recent-winners",
+            "desc": "Luna 大胆 reframe;headache saver 定位\"让非技术人自己维护内容\"。学它:一句话把价值讲到评委记住。",
+            "src": "lablab.ai / Dust"
+          }
+        }
+      ]
+    }
+  ]
+}
