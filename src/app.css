@@ -143,3 +143,24 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .train-accordion .train-exercise-item { border-color:transparent; background:var(--bg); }
 .train-generate { margin-top:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
 .train-generate .train-actions { flex-wrap:wrap; justify-content:center; }
+
+.plan-section { width:100%; border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
+.plan-cards { display:flex; gap:10px; }
+.plan-card { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:var(--card); border:1px solid var(--line); border-radius:14px; font-size:14px; color:var(--ink); }
+.plan-card-emoji { font-size:22px; }
+.plan-sheet { gap:12px; }
+.plan-note { line-height:1.5; }
+.plan-trip-list { list-style:none; margin:0; padding:0 10px 10px; display:flex; flex-direction:column; gap:10px; }
+.plan-trip-card { border-top:1px solid var(--line); padding-top:8px; }
+.plan-trip-card:first-child { border-top:none; padding-top:0; }
+.plan-trip-head { display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--muted); }
+.plan-trip-done { color:var(--accent); font-weight:700; }
+.plan-excluded { padding:0 10px 10px; line-height:1.7; }
+.plan-check-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.plan-check-list label { display:flex; align-items:flex-start; gap:8px; font-size:14px; cursor:pointer; }
+.plan-check-list input { margin-top:3px; }
+.plan-item-done { color:var(--muted); text-decoration:line-through; }
+.plan-item-out { display:block; font-size:12px; color:var(--accent); margin-top:2px; }
+.plan-phase { margin-top:6px; }
+.plan-week-body { padding:0 10px 10px; display:flex; flex-direction:column; gap:12px; }
+.plan-week-section-title { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }

@@ -4,6 +4,10 @@ import { fetchDailyImage, type DailyImage } from '../lib/dailyImage'
 import { todayQuote } from '../lib/quote'
 import { CalendarView } from './CalendarView'
 import { DogBanner } from './DogBanner'
+import { LearningPlanView } from './LearningPlanView'
+import { TravelPlanView } from './TravelPlanView'
+
+type PlanOverlay = 'travel' | 'learning' | null
 
 const MOODS = ['😊', '😐', '😮‍💨', '🥳', '😢', '🤒']
 const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六']
@@ -21,6 +25,7 @@ function formatClock(d: Date): string {
 export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; onSaved: () => void; active: boolean }) {
   const [now, setNow] = useState(new Date())
   const [image, setImage] = useState<DailyImage | null>(null)
+  const [planOverlay, setPlanOverlay] = useState<PlanOverlay>(null)
   const { selected, pick } = useMood(refreshKey, onSaved, active)
   const quote = todayQuote(now)
 
@@ -71,7 +76,22 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
         )}
       </div>
       <CalendarView active={active} />
+      <div className="plan-section">
+        <p className="section-title">规划</p>
+        <div className="plan-cards">
+          <button className="plan-card" onClick={() => setPlanOverlay('travel')}>
+            <span className="plan-card-emoji">✈️</span>
+            <span>旅行规划</span>
+          </button>
+          <button className="plan-card" onClick={() => setPlanOverlay('learning')}>
+            <span className="plan-card-emoji">📘</span>
+            <span>学习规划</span>
+          </button>
+        </div>
+      </div>
       <DogBanner />
+      {planOverlay === 'travel' && <TravelPlanView onClose={() => setPlanOverlay(null)} />}
+      {planOverlay === 'learning' && <LearningPlanView onClose={() => setPlanOverlay(null)} />}
     </div>
   )
 }

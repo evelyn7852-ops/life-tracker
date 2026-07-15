@@ -118,4 +118,25 @@ describe('HomeView', () => {
     expect(saveMock).not.toHaveBeenCalled()
     expect(onSaved).toHaveBeenCalled()
   })
+
+  it('日历下方渲染「规划」区，含旅行/学习两张入口卡', () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(screen.getByText('规划')).toBeTruthy()
+    expect(screen.getByText('旅行规划')).toBeTruthy()
+    expect(screen.getByText('学习规划')).toBeTruthy()
+  })
+
+  it('点击「旅行规划」卡 → 打开旅行规划全屏 overlay', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    await userEvent.click(screen.getByText('旅行规划'))
+    expect(document.querySelector('.day-detail-overlay')).toBeTruthy()
+    expect(screen.getByText(/五一\/十一\/圣诞/)).toBeTruthy()
+  })
+
+  it('点击「学习规划」卡 → 打开学习规划全屏 overlay', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    await userEvent.click(screen.getByText('学习规划'))
+    expect(document.querySelector('.day-detail-overlay')).toBeTruthy()
+    expect(screen.getByText(/云同步待 V1.5/)).toBeTruthy()
+  })
 })
