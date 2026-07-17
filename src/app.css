@@ -176,6 +176,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .plan-week-section-title { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
 
 .trip-quarter-banner { background:#eef3ff; border-color:var(--accent); }
+.home-quarter-banner { width:100%; text-align:left; background:#eef3ff; border-color:var(--accent); color:var(--ink); font-size:14px; }
 .trip-status-badge { color:var(--muted); font-size:12px; }
 .trip-edit-card { display:flex; flex-direction:column; gap:6px; padding:10px; }
 .trip-edit-card input, .trip-edit-card select { width:100%; padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; }

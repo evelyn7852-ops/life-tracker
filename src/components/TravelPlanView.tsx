@@ -36,6 +36,9 @@ function draftToPatch(d: TripDraft): Partial<NewTrip> {
     country: d.country.trim() || null,
     days: d.days,
     budget_cny: d.budget_cny,
+    // 一旦编辑填入真实预算数字，就清掉 budget_stale——否则 formatBudget 永远显示「预算待估」，
+    // 3 条种子 stale 行程（budget_cny:null）改完预算也刷不出来。清空为 null 时保持 stale 原样。
+    ...(typeof d.budget_cny === 'number' ? { budget_stale: false } : {}),
     status: d.status,
     notes: d.notes.trim() || null,
   }

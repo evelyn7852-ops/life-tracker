@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -14,18 +14,32 @@ vi.mock('../lib/entriesRepo', () => ({
 const listWorkoutsMock = vi.fn().mockResolvedValue([])
 vi.mock('../lib/workoutRepo', () => ({ listWorkouts: (o: unknown) => listWorkoutsMock(o) }))
 
-// TravelPlanView（阶段②起）改从 DB 读取，这里挡掉真实 supabase 请求。
+// TravelPlanView + Home 本季提醒（阶段②起）改从 DB 读取，这里挡掉真实 supabase 请求，
+// 但保留 currentQuarterTrips 真实实现——Home banner 与 modal 共享同一个筛选 helper。
 const seedTripsIfEmptyMock = vi.fn().mockResolvedValue(undefined)
 const listTripsMock = vi.fn().mockResolvedValue([])
-vi.mock('../lib/tripRepo', () => ({
-  seedTripsIfEmpty: () => seedTripsIfEmptyMock(),
-  listTrips: () => listTripsMock(),
-  insertTrip: vi.fn(),
-  updateTrip: vi.fn(),
-  deleteTrip: vi.fn(),
-  countYearConflicts: () => 0,
-  currentQuarterTrips: () => [],
-}))
+vi.mock('../lib/tripRepo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/tripRepo')>()
+  return {
+    ...actual,
+    seedTripsIfEmpty: () => seedTripsIfEmptyMock(),
+    listTrips: () => listTripsMock(),
+    insertTrip: vi.fn(),
+    updateTrip: vi.fn(),
+    deleteTrip: vi.fn(),
+  }
+})
+
+import type { TripRow } from '../lib/tripRepo'
+
+function tripRow(overrides: Partial<TripRow> = {}): TripRow {
+  return {
+    id: 'id-1', year: 2026, slot: '五一', period_hint: null, destination: '目的地', country: '中国',
+    trip_type: 'domestic', days: 7, status: 'planned', budget_cny: 5000, budget_stale: false,
+    notes: null, seed_key: null, created_at: '2026-01-01T00:00:00Z',
+    ...overrides,
+  }
+}
 
 const saveMock = vi.fn().mockResolvedValue('synced')
 vi.mock('../lib/outbox', () => ({ saveEntry: (d: unknown) => saveMock(d) }))
@@ -165,5 +179,43 @@ describe('HomeView', () => {
     await userEvent.click(screen.getByText('学习规划'))
     expect(document.querySelector('.day-detail-overlay')).toBeTruthy()
     expect(screen.getByText(/云同步待 V1.5/)).toBeTruthy()
+  })
+
+  describe('本季计划提醒 banner', () => {
+    beforeEach(() => { vi.useFakeTimers().setSystemTime(new Date('2026-07-17T09:00:00')) })
+    afterEach(() => { vi.useRealTimers() })
+
+    it('当年当季有 planned/booked 行程 → 顶部显示「本季计划：X」', async () => {
+      // 2026-07 属 Q3；slot「7月」→Q3 命中
+      listTripsMock.mockResolvedValue([
+        tripRow({ id: 'q3', year: 2026, slot: '7月', destination: '内蒙古草原', status: 'planned' }),
+      ])
+      render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+      await vi.waitFor(() => expect(screen.getByText(/本季计划/)).toBeTruthy())
+      expect(screen.getByText(/内蒙古草原/)).toBeTruthy()
+    })
+
+    it('本季无命中行程 → 不渲染 banner', async () => {
+      listTripsMock.mockResolvedValue([
+        tripRow({ id: 'q4', year: 2026, slot: '十一', destination: '别处', status: 'planned' }),
+      ])
+      render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+      await vi.waitFor(() => expect(listTripsMock).toHaveBeenCalled())
+      expect(screen.queryByText(/本季计划/)).toBeFalsy()
+    })
+
+    it('trips 表不存在（listTrips reject）→ 静默，不崩溃、不显示 banner', async () => {
+      listTripsMock.mockRejectedValue(new Error('relation "trips" does not exist'))
+      render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+      await vi.waitFor(() => expect(listTripsMock).toHaveBeenCalled())
+      expect(screen.queryByText(/本季计划/)).toBeFalsy()
+      // 页面其它部分仍在
+      expect(screen.getByText('规划')).toBeTruthy()
+    })
+
+    it('active=false 时不拉取行程', () => {
+      render(<HomeView refreshKey={0} onSaved={() => {}} active={false} />)
+      expect(listTripsMock).not.toHaveBeenCalled()
+    })
   })
 })
