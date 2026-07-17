@@ -178,7 +178,8 @@ describe('HomeView', () => {
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     await userEvent.click(screen.getByText('学习规划'))
     expect(document.querySelector('.day-detail-overlay')).toBeTruthy()
-    expect(screen.getByText(/云同步待 V1.5/)).toBeTruthy()
+    expect(screen.getByText('学习流')).toBeTruthy()
+    expect(screen.getByText('集训存档')).toBeTruthy()
   })
 
   describe('本季计划提醒 banner', () => {

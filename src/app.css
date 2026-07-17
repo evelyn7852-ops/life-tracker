@@ -190,3 +190,10 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .trip-conflict-hint { color:#b3720a; font-size:12px; }
 .trip-add-row { padding:0 10px 10px; }
 .trip-add-btn { width:100%; padding:8px; border:1px dashed var(--line); border-radius:10px; background:none; color:var(--accent); font-size:13px; }
+
+.stream-item { padding-bottom:36px; }
+.stream-auto-badge { font-size:11px; color:var(--accent); background:var(--bg); border-radius:999px; padding:2px 8px; }
+.stream-item-link { display:inline-block; font-size:13px; color:var(--accent); margin-bottom:4px; }
+.stream-status-switch { margin-top:6px; margin-bottom:0; }
+.stream-status-switch button:disabled { opacity:1; }
+.stream-sync-hint { color:#b3720a; }
