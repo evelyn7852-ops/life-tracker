@@ -35,3 +35,12 @@ export async function listEntries(opts: ListOpts = {}): Promise<Entry[]> {
   if (error) throw error
   return data as Entry[]
 }
+
+/** 只数条数、不拉行数据（head+count），用于「今年总记录数」这类轻量统计。 */
+export async function countEntries(fromTs: string, toTs: string): Promise<number> {
+  const { count, error } = await supabase.from('entries')
+    .select('id', { count: 'exact', head: true })
+    .gte('ts', fromTs).lt('ts', toTs)
+  if (error) throw error
+  return count ?? 0
+}
