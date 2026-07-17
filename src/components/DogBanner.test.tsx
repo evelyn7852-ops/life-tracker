@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, cleanup, act } from '@testing-library/react'
-import { DogBanner } from './DogBanner'
+import { DogBanner, pickStateWeights } from './DogBanner'
+import type { Domain } from '../lib/types'
+
+function maxKey(w: Record<string, number>): string {
+  return Object.entries(w).sort((a, b) => b[1] - a[1])[0][0]
+}
 
 function mockMatchMedia(matches: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -87,5 +92,49 @@ describe('DogBanner', () => {
     unmount()
     expect(clearSpy).toHaveBeenCalled()
     clearSpy.mockRestore()
+  })
+
+  it('传入 todayDomains（含空数组）后按权重加权切换，不再是均匀随机', () => {
+    vi.useFakeTimers()
+    const randomSpy = vi.spyOn(Math, 'random')
+    randomSpy.mockReturnValueOnce(0) // delay factor → 最短 8000ms
+    randomSpy.mockReturnValueOnce(0.5) // 权重池 [nap:1,eat:4,scratch:1] 累计区间 [0,1)/[1,5)/[5,6)，0.5*6=3 落入 eat 区间
+    render(<DogBanner todayDomains={['food']} />)
+    act(() => { vi.advanceTimersByTime(8000) })
+    // food 偏向 eat，权重最大（4/6），应命中 eat
+    expect(document.querySelector('.dog-eat')).toBeTruthy()
+    randomSpy.mockRestore()
+  })
+})
+
+describe('pickStateWeights（纯函数：当日域集合 + sad → 状态权重）', () => {
+  it('记了 food → eat 权重最高', () => {
+    const w = pickStateWeights(['food'] as Domain[], false)
+    expect(maxKey(w)).toBe('eat')
+  })
+
+  it('记了 workout → run 权重最高', () => {
+    const w = pickStateWeights(['workout'] as Domain[], false)
+    expect(maxKey(w)).toBe('run')
+  })
+
+  it('记了 reading/learning → nap（趴卧看书复用）权重最高', () => {
+    expect(maxKey(pickStateWeights(['reading'] as Domain[], false))).toBe('nap')
+    expect(maxKey(pickStateWeights(['learning'] as Domain[], false))).toBe('nap')
+  })
+
+  it('当日无记录（空数组）→ nap 权重最高', () => {
+    const w = pickStateWeights([], false)
+    expect(maxKey(w)).toBe('nap')
+  })
+
+  it('sad=true → nap（安慰/依偎）权重最高，即使当天记了 workout 也优先安慰', () => {
+    const w = pickStateWeights(['workout'] as Domain[], true)
+    expect(maxKey(w)).toBe('nap')
+  })
+
+  it('所有状态权重仍 ≥ 1（偏向而非绑定，仍有随机机会）', () => {
+    const w = pickStateWeights(['food'] as Domain[], false)
+    expect(Object.values(w).every((v) => v >= 1)).toBe(true)
   })
 })
