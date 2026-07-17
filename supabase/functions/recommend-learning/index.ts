@@ -7,6 +7,10 @@ const DEFAULT_LLM_MODEL = 'agnes-2.0-flash'
 
 const MAX_EXISTING_TITLES = 200
 const MAX_RESULT_ITEMS = 3
+// 近期 learning 记录作为「这人最近在学什么」的信号，喂给 prompt 提升相关性。
+const RECENT_ENTRY_DAYS = 60
+const MAX_RECENT_ENTRIES = 30
+const MAX_RECENT_ENTRY_CHARS = 1500
 
 interface ExistingItem { title: string; url: string | null }
 
@@ -27,23 +31,51 @@ interface Recommendation {
 }
 
 function buildSystemPrompt(): string {
-  return `你是一个 AI 学习资源推荐助手。只输出 JSON 数组，不要解释、不要 markdown 代码块。
+  return `你是一个 AI 学习资源推荐助手，为一位特定读者挑选资源。只输出 JSON 数组，不要解释、不要 markdown 代码块。
 
 输出格式固定为：[{"title":"...","url":"...","source":"...","tag":"...","note":"..."}]，2-3 条。
 
-严格要求：
-- 只推荐你确信真实存在的资源——知名机构（OpenAI、Anthropic、Google、DeepMind、知名大学/课程平台等）发布的官方文档、论文、课程。
-- 绝不编造 URL 或资源；如果不确定某个资源是否真实存在，宁可少给甚至不给，也不要猜。
-- 避免推荐下面「已有清单」中列出的标题（避免重复）。
-- title 必填；url 若不确定可省略或留空；source/tag/note 可选，是简短字符串。`
+## 读者画像（推荐必须贴合此人，不是泛泛的「AI 学习者」）
+技术流营销经理（医药行业），自建 AI 工具，动手写代码和 prompt。**不是 ML 研究者，不训练模型**，不关心底层网络结构和训练技巧。
+
+关注四个方向：
+① Agent 工程与产品：架构模式、工具调用、eval/评测、PRD、上线运维。
+② Claude 生态深用：Claude Code / Cowork / MCP / skills / API 新能力与最佳实践。
+③ AI 在医药/商业的应用：制药行业 AI、RWE、商业分析自动化、AI 辅助决策。
+④ AI 前沿动态：新模型/新范式的重要进展（不是入门教程）。
+
+## 禁止推荐（读者早已越过这个阶段，推这些等于浪费她时间）
+- 入门/基础/科普类：如「什么是 LLM」「AI 入门」类内容。
+- 经典奠基论文：如 Attention Is All You Need、BERT、GPT-1/2 原始论文等。
+- 深度学习入门课：如 Deep Learning Specialization、CS231n、fast.ai 等。
+- 框架文档与教程：如 PyTorch / TensorFlow / Keras 官方文档或入门教程。
+- 模型训练/微调底层技术（除非与 agent 工程或行业应用直接相关）。
+
+宁可只给 1 条真正贴合的，也不要用通用入门货凑数。**通用「AI 名作」= 失败的推荐。**
+
+## 真实性（硬约束）
+- 只推荐你确信真实存在的资源——知名机构（Anthropic、OpenAI、Google/DeepMind、知名大学、权威行业媒体/期刊等）发布的官方文档、论文、课程、工程博客。
+- 绝不编造 URL 或资源；不确定是否真实存在就不要给。**少给不是问题，编造是致命问题。**
+- 避免推荐「已有清单」中已列出的标题。
+
+## 字段
+title 必填；url 若不确定可省略或留空（不要为凑字段编 URL）；source/tag/note 可选，简短字符串。note 用一句话说明「为什么这条值得这位读者看」。`
 }
 
-function buildUserPrompt(existing: ExistingItem[]): string {
+function buildUserPrompt(existing: ExistingItem[], recentEntries: string[]): string {
   const titles = existing.map((e) => e.title).filter(Boolean)
   const existingLine = titles.length > 0
     ? `已有清单（请避免重复推荐这些标题）：\n${titles.map((t) => `- ${t}`).join('\n')}`
     : '已有清单为空。'
-  return `请推荐 2-3 条当前值得学习的 AI 相关资源（官方文档、论文、课程等）。\n\n${existingLine}\n\n直接输出 JSON 数组，不要任何解释文字。`
+
+  let recentBlock = ''
+  if (recentEntries.length > 0) {
+    let joined = recentEntries.map((t) => `- ${t}`).join('\n')
+    if (joined.length > MAX_RECENT_ENTRY_CHARS) joined = joined.slice(0, MAX_RECENT_ENTRY_CHARS)
+    recentBlock = `\n该用户最近在学的东西（近${RECENT_ENTRY_DAYS}天的学习记录，据此判断她的当前兴趣和水平）：\n${joined}\n`
+  }
+
+  return `请为上述读者画像推荐 2-3 条值得学习的 AI 资源，紧扣她关注的四个方向，避开入门/基础类。\n\n${existingLine}\n${recentBlock}\n直接输出 JSON 数组，不要任何解释文字。`
 }
 
 /** 解析 LLM 返回内容为 JSON；兼容 markdown 代码块包裹（```json ... ```）。解析失败或结果非数组返回 null。 */
@@ -103,6 +135,7 @@ function sanitizeRecommendations(raw: unknown[], existing: ExistingItem[]): Reco
 
 async function fetchRecommendationsForUser(
   existing: ExistingItem[],
+  recentEntries: string[],
   env: { baseUrl: string; model: string; apiKey: string },
 ): Promise<Recommendation[]> {
   const resp = await fetch(`${env.baseUrl}/chat/completions`, {
@@ -115,7 +148,7 @@ async function fetchRecommendationsForUser(
       model: env.model,
       messages: [
         { role: 'system', content: buildSystemPrompt() },
-        { role: 'user', content: buildUserPrompt(existing) },
+        { role: 'user', content: buildUserPrompt(existing, recentEntries) },
       ],
       max_tokens: 800,
       temperature: 0.4,
@@ -193,7 +226,26 @@ Deno.serve(async (req) => {
         url: r.url ? String(r.url) : null,
       }))
 
-      const recommendations = await fetchRecommendationsForUser(existing, { baseUrl, model, apiKey })
+      // 近期 learning 记录：额外的兴趣/水平信号。查询失败或无记录不影响本轮推荐，仅少一份上下文。
+      let recentEntries: string[] = []
+      const since = new Date(Date.now() - RECENT_ENTRY_DAYS * 86400_000).toISOString()
+      const { data: entryRows, error: entriesErr } = await supabase
+        .from('entries')
+        .select('raw_text')
+        .eq('user_id', user.id)
+        .eq('domain', 'learning')
+        .gte('ts', since)
+        .order('ts', { ascending: false })
+        .limit(MAX_RECENT_ENTRIES)
+      if (entriesErr) {
+        console.error(`[recommend-learning] fetch recent entries failed for user ${user.id}: ${entriesErr.message}`)
+      } else {
+        recentEntries = (entryRows ?? [])
+          .map((r) => String(r.raw_text ?? '').trim())
+          .filter(Boolean)
+      }
+
+      const recommendations = await fetchRecommendationsForUser(existing, recentEntries, { baseUrl, model, apiKey })
       if (recommendations.length === 0) continue
 
       const rows = recommendations.map((rec) => ({
