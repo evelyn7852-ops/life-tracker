@@ -4,10 +4,15 @@ import userEvent from '@testing-library/user-event'
 
 const listEntriesMock = vi.fn()
 const updateEntryMock = vi.fn().mockResolvedValue({})
+const countEntriesMock = vi.fn().mockResolvedValue(0)
 vi.mock('../lib/entriesRepo', () => ({
   listEntries: (o: unknown) => listEntriesMock(o),
   updateEntry: (id: string, patch: unknown) => updateEntryMock(id, patch),
+  countEntries: (f: string, t: string) => countEntriesMock(f, t),
 }))
+
+const listWorkoutsMock = vi.fn().mockResolvedValue([])
+vi.mock('../lib/workoutRepo', () => ({ listWorkouts: (o: unknown) => listWorkoutsMock(o) }))
 
 const saveMock = vi.fn().mockResolvedValue('synced')
 vi.mock('../lib/outbox', () => ({ saveEntry: (d: unknown) => saveMock(d) }))
@@ -21,6 +26,8 @@ describe('HomeView', () => {
   beforeEach(() => {
     listEntriesMock.mockReset().mockResolvedValue([])
     updateEntryMock.mockClear()
+    countEntriesMock.mockReset().mockResolvedValue(0)
+    listWorkoutsMock.mockReset().mockResolvedValue([])
     saveMock.mockClear()
     fetchDailyImageMock.mockReset().mockResolvedValue(null)
   })
@@ -92,6 +99,11 @@ describe('HomeView', () => {
   it('渲染狗 banner', async () => {
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     expect(document.querySelector('.dog-banner')).toBeTruthy()
+  })
+
+  it('日历下方渲染统计卡（streak）', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(await screen.findByText(/🔥.*连续/)).toBeTruthy()
   })
 
   it('点击 emoji（今日无已有心情）→ saveEntry 新建 journal mood 条', async () => {

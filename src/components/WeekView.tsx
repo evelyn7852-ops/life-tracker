@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
 import { generateSummary, getSummary, type PeriodType, type Summary } from '../lib/summaryRepo'
+import { computeStreak } from '../lib/stats'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
+
+const STREAK_LOOKBACK_DAYS = 60 // 覆盖当月 + 足够判断连续记录天数
 
 export function weekStart(d: Date = new Date()): Date {
   const start = new Date(d)
@@ -49,7 +52,9 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
   const lastFetched = useRef(-1)
   const load = useCallback(async () => {
     setLoading(true)
-    setRows(await listEntries({ fromTs: weekStart().toISOString(), limit: 500 }))
+    // 拉近 60 天（覆盖本周 + 本月 + streak 判断），本地按需切片，避免多次请求。
+    const from = new Date(); from.setDate(from.getDate() - STREAK_LOOKBACK_DAYS)
+    setRows(await listEntries({ fromTs: from.toISOString(), limit: 1000 }))
     setLoading(false)
   }, [])
   useEffect(() => {
@@ -95,19 +100,30 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
     }
   }
 
-  const counts = ALL_DOMAINS.map((d) => ({ d, n: rows.filter((r) => r.domain === d).length }))
+  const wStart = weekStart()
+  const weekRows = rows.filter((r) => new Date(r.ts) >= wStart)
+  const mStart = monthStart()
+  const monthRows = rows.filter((r) => new Date(r.ts) >= mStart)
+  const entryDates = [...new Set(rows.map((r) => toDateStr(new Date(r.ts))))]
+  const streak = computeStreak(entryDates, new Date())
+
+  const counts = ALL_DOMAINS.map((d) => ({ d, n: weekRows.filter((r) => r.domain === d).length }))
   const max = Math.max(1, ...counts.map((c) => c.n))
-  const days = new Set(rows.map((r) => new Date(r.ts).toDateString()))
+  const days = new Set(weekRows.map((r) => new Date(r.ts).toDateString()))
   const periodLabel = summaryType === 'week' ? '本周' : '本月'
 
   return (
     <div className="view">
+      <div className="week-stats-strip">
+        <span>🔥 连续 {streak} 天</span>
+        <span className="muted">本月 {monthRows.length} 条</span>
+      </div>
       <p className="view-title">周览 {weekRangeLabel()}</p>
       {loading && rows.length === 0 ? (
         <p className="muted empty">加载中…</p>
       ) : (
         <>
-          <p className="muted">本周记录 {rows.length} 条 · 活跃 {days.size} 天</p>
+          <p className="muted">本周记录 {weekRows.length} 条 · 活跃 {days.size} 天</p>
           {counts.map(({ d, n }) => (
             <div key={d} className="bar-row">
               <span className="bar-label">{DOMAIN_LABEL[d]}</span>

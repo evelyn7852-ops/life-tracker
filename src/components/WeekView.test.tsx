@@ -123,3 +123,33 @@ describe('WeekView AI 总结', () => {
     expect(getSummaryMock).not.toHaveBeenCalled()
   })
 })
+
+describe('WeekView 顶部 streak + 本月计数条', () => {
+  beforeEach(() => {
+    listEntriesMock.mockReset().mockResolvedValue([])
+    getSummaryMock.mockReset().mockResolvedValue(null)
+    generateSummaryMock.mockReset()
+  })
+
+  it('渲染 streak（🔥 连续 N 天）', async () => {
+    const today = new Date()
+    const ts = (offset: number) => {
+      const d = new Date(today); d.setDate(d.getDate() - offset)
+      return d.toISOString()
+    }
+    listEntriesMock.mockResolvedValue([
+      { id: '1', ts: ts(0), domain: 'food', raw_text: '', data: { meal: '早', items: [] }, parse_source: 'manual', tags: [] },
+      { id: '2', ts: ts(1), domain: 'food', raw_text: '', data: { meal: '早', items: [] }, parse_source: 'manual', tags: [] },
+    ])
+    render(<WeekView refreshKey={0} active />)
+    expect(await screen.findByText(/🔥.*连续.*2.*天/)).toBeTruthy()
+  })
+
+  it('渲染本月计数', async () => {
+    listEntriesMock.mockResolvedValue([
+      { id: '1', ts: new Date().toISOString(), domain: 'food', raw_text: '', data: { meal: '早', items: [] }, parse_source: 'manual', tags: [] },
+    ])
+    render(<WeekView refreshKey={0} active />)
+    expect(await screen.findByText(/本月.*1.*条/)).toBeTruthy()
+  })
+})

@@ -5,6 +5,7 @@ import { todayQuote } from '../lib/quote'
 import { CalendarView } from './CalendarView'
 import { DogBanner } from './DogBanner'
 import { LearningPlanView } from './LearningPlanView'
+import { StatsCard } from './StatsCard'
 import { TravelPlanView } from './TravelPlanView'
 
 type PlanOverlay = 'travel' | 'learning' | null
@@ -76,6 +77,7 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
         )}
       </div>
       <CalendarView active={active} />
+      <StatsCard refreshKey={refreshKey} active={active} />
       <div className="plan-section">
         <p className="section-title">规划</p>
         <div className="plan-cards">
