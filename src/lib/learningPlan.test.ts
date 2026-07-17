@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import learningPlanData from '../data/learningPlan.json'
 import {
   flattenMastery, flattenSetup, flattenWeekSection, loadProgress, saveProgress, toggleProgress,
-  PROGRESS_KEY,
+  PROGRESS_KEY, type LearningPlanData,
 } from './learningPlan'
 
 describe('flattenSetup', () => {
@@ -29,6 +30,26 @@ describe('flattenMastery', () => {
   it('生成 m{phaseP}-{i} 形式 id', () => {
     const items = flattenMastery(2, ['t1', 't2'])
     expect(items.map((i) => i.id)).toEqual(['m2-0', 'm2-1'])
+  })
+})
+
+describe('原 dashboard 真实数据 id 契约（云同步/勾选迁移依赖这套 id 不变）', () => {
+  const data = learningPlanData as LearningPlanData
+
+  it('setup-0 对应真实 setup 清单第一条', () => {
+    expect(flattenSetup(data.setup)[0].id).toBe('setup-0')
+  })
+
+  it('w1-learn-0 对应第 1 周 learn 第一条', () => {
+    const week1 = data.phases[0].weeks[0]
+    expect(week1.n).toBe(1)
+    expect(flattenWeekSection(week1.n, 'learn', week1.learn)[0].id).toBe('w1-learn-0')
+  })
+
+  it('m1-0 对应 Phase 1 掌握度自查第一条', () => {
+    const phase1 = data.phases[0]
+    expect(phase1.p).toBe(1)
+    expect(flattenMastery(phase1.p, phase1.takeaways)[0].id).toBe('m1-0')
   })
 })
 
