@@ -14,6 +14,19 @@ vi.mock('../lib/entriesRepo', () => ({
 const listWorkoutsMock = vi.fn().mockResolvedValue([])
 vi.mock('../lib/workoutRepo', () => ({ listWorkouts: (o: unknown) => listWorkoutsMock(o) }))
 
+// TravelPlanView（阶段②起）改从 DB 读取，这里挡掉真实 supabase 请求。
+const seedTripsIfEmptyMock = vi.fn().mockResolvedValue(undefined)
+const listTripsMock = vi.fn().mockResolvedValue([])
+vi.mock('../lib/tripRepo', () => ({
+  seedTripsIfEmpty: () => seedTripsIfEmptyMock(),
+  listTrips: () => listTripsMock(),
+  insertTrip: vi.fn(),
+  updateTrip: vi.fn(),
+  deleteTrip: vi.fn(),
+  countYearConflicts: () => 0,
+  currentQuarterTrips: () => [],
+}))
+
 const saveMock = vi.fn().mockResolvedValue('synced')
 vi.mock('../lib/outbox', () => ({ saveEntry: (d: unknown) => saveMock(d) }))
 
@@ -30,6 +43,8 @@ describe('HomeView', () => {
     listWorkoutsMock.mockReset().mockResolvedValue([])
     saveMock.mockClear()
     fetchDailyImageMock.mockReset().mockResolvedValue(null)
+    seedTripsIfEmptyMock.mockReset().mockResolvedValue(undefined)
+    listTripsMock.mockReset().mockResolvedValue([])
   })
 
   it('渲染大日期', async () => {

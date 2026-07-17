@@ -28,14 +28,14 @@ export interface TravelPlanData {
   unscheduled: UnscheduledDestination[]
 }
 
-export interface YearGroup {
+export interface YearGroup<T = Trip> {
   year: number
-  trips: Trip[]
+  trips: T[]
 }
 
-/** Groups trips by year, years ascending. */
-export function groupTripsByYear(trips: Trip[]): YearGroup[] {
-  const map = new Map<number, Trip[]>()
+/** Groups trips by year, years ascending. Generic so DB-backed TripRow[] (阶段②) can reuse it too. */
+export function groupTripsByYear<T extends { year: number }>(trips: T[]): YearGroup<T>[] {
+  const map = new Map<number, T[]>()
   for (const t of trips) {
     if (!map.has(t.year)) map.set(t.year, [])
     map.get(t.year)!.push(t)
@@ -46,7 +46,7 @@ export function groupTripsByYear(trips: Trip[]): YearGroup[] {
 }
 
 /** Moves the current-year group to the front; other years stay ascending. */
-export function orderGroupsCurrentFirst(groups: YearGroup[], currentYear: number): YearGroup[] {
+export function orderGroupsCurrentFirst<T>(groups: YearGroup<T>[], currentYear: number): YearGroup<T>[] {
   const idx = groups.findIndex((g) => g.year === currentYear)
   if (idx <= 0) return groups
   return [groups[idx], ...groups.slice(0, idx), ...groups.slice(idx + 1)]

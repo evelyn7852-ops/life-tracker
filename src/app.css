@@ -174,3 +174,15 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .plan-phase { margin-top:6px; }
 .plan-week-body { padding:0 10px 10px; display:flex; flex-direction:column; gap:12px; }
 .plan-week-section-title { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+
+.trip-quarter-banner { background:#eef3ff; border-color:var(--accent); }
+.trip-status-badge { color:var(--muted); font-size:12px; }
+.trip-edit-card { display:flex; flex-direction:column; gap:6px; padding:10px; }
+.trip-edit-card input, .trip-edit-card select { width:100%; padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+.trip-edit-row { display:flex; gap:8px; align-items:center; }
+.trip-edit-row input { flex:1; }
+.trip-edit-row label { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); white-space:nowrap; }
+.trip-edit-row label input { width:80px; }
+.trip-conflict-hint { color:#b3720a; font-size:12px; }
+.trip-add-row { padding:0 10px 10px; }
+.trip-add-btn { width:100%; padding:8px; border:1px dashed var(--line); border-radius:10px; background:none; color:var(--accent); font-size:13px; }
