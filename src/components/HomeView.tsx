@@ -4,7 +4,6 @@ import { fetchDailyImage, type DailyImage } from '../lib/dailyImage'
 import { todayQuote } from '../lib/quote'
 import { currentQuarterTrips, listTrips, type TripRow } from '../lib/tripRepo'
 import { CalendarView } from './CalendarView'
-import { DogBanner } from './DogBanner'
 import { LearningPlanView } from './LearningPlanView'
 import { StatsCard } from './StatsCard'
 import { TravelPlanView } from './TravelPlanView'
@@ -109,7 +108,6 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
           </button>
         </div>
       </div>
-      <DogBanner />
       {planOverlay === 'travel' && <TravelPlanView onClose={() => setPlanOverlay(null)} />}
       {planOverlay === 'learning' && <LearningPlanView onClose={() => setPlanOverlay(null)} />}
     </div>

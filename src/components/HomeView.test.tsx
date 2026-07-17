@@ -125,9 +125,9 @@ describe('HomeView', () => {
     expect(await screen.findByText(/——/)).toBeTruthy()
   })
 
-  it('渲染狗 banner', async () => {
+  it('不再渲染狗 banner（V1.5b 起移至 App 全局，贴 tab 栏上方）', async () => {
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
-    expect(document.querySelector('.dog-banner')).toBeTruthy()
+    expect(document.querySelector('.dog-banner')).toBeNull()
   })
 
   it('日历下方渲染统计卡（streak）', async () => {
