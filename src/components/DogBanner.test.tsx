@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, cleanup, act } from '@testing-library/react'
+import { render, cleanup, act, fireEvent } from '@testing-library/react'
 import { DogBanner, pickStateWeights } from './DogBanner'
 import type { Domain } from '../lib/types'
 
@@ -108,6 +108,54 @@ describe('DogBanner', () => {
     // food 偏向 eat，权重最大（4/6），应命中 eat
     expect(document.querySelector('.dog-eat')).toBeTruthy()
     randomSpy.mockRestore()
+  })
+
+  it('§D 点击狗触发随机互动反应（打断当前状态），播完约 1s 后回归状态机', () => {
+    vi.useFakeTimers()
+    const cryptoSpy = vi.spyOn(crypto, 'getRandomValues').mockImplementation(((arr: Uint32Array) => {
+      arr[0] = 0 // pseudoRandom()→0：BODY_REACTIONS[0]='jump'（嗅地判定也命中，但延迟 2s 起，晚于本测试窗口不影响断言）
+      return arr
+    }) as typeof crypto.getRandomValues)
+    render(<DogBanner />)
+    const dog = document.querySelector('.dog')!
+    expect(document.querySelector('.dog-run')).toBeTruthy()
+    act(() => { fireEvent.click(dog) })
+    expect(document.querySelector('.dog-reaction-jump')).toBeTruthy()
+    expect(document.querySelector('.dog-reaction-heart')).toBeTruthy() // jump 反应叠加 ❤️ 冒出
+    expect(document.querySelector('.dog-run')).toBeNull() // 打断当前状态，run 类暂时不在
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(document.querySelector('.dog-reaction-jump')).toBeNull()
+    expect(document.querySelector('.dog-run')).toBeTruthy() // 回归状态机
+    cryptoSpy.mockRestore()
+  })
+
+  it('§D 3 秒内连点 3 次 → 触发慢速打滚彩蛋', () => {
+    vi.useFakeTimers()
+    const cryptoSpy = vi.spyOn(crypto, 'getRandomValues').mockImplementation(((arr: Uint32Array) => {
+      arr[0] = 4294967295 // pseudoRandom()→≈1，避开嗅地触发概率区间（>0.4 不触发嗅地）
+      return arr
+    }) as typeof crypto.getRandomValues)
+    render(<DogBanner />)
+    const dog = document.querySelector('.dog')!
+    act(() => {
+      fireEvent.click(dog)
+      fireEvent.click(dog)
+      fireEvent.click(dog)
+    })
+    expect(document.querySelector('.dog-reaction-roll')).toBeTruthy()
+    cryptoSpy.mockRestore()
+  })
+
+  it('§D reduced-motion 下点击只弹静态 ❤️，600ms 后消失', () => {
+    mockMatchMedia(true)
+    vi.useFakeTimers()
+    render(<DogBanner />)
+    const dog = document.querySelector('.dog-sit')!
+    expect(document.querySelector('.dog-reaction-heart-static')).toBeNull()
+    act(() => { fireEvent.click(dog) })
+    expect(document.querySelector('.dog-reaction-heart-static')).toBeTruthy()
+    act(() => { vi.advanceTimersByTime(600) })
+    expect(document.querySelector('.dog-reaction-heart-static')).toBeNull()
   })
 
   it('走路中偶发嗅地：暂停后头部旋转 -8°，1.5s 后恢复', () => {

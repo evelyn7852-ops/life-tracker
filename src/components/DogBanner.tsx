@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import type { Domain } from '../lib/types'
 
 export type DogState = 'run' | 'nap' | 'eat' | 'scratch'
+/** §D 点击互动：body 反应三选一随机播放；heart-static 是 reduced-motion 下的唯一分支，不参与随机。 */
+export type BodyReaction = 'jump' | 'spin' | 'wag' | 'roll'
+export type Reaction = BodyReaction | 'heart-static'
 
 const STATES: DogState[] = ['run', 'nap', 'eat', 'scratch']
 const MIN_DELAY_MS = 8000
@@ -12,6 +15,12 @@ const SNIFF_CHANCE = 0.4 // 走路中偶发「嗅地」停顿的触发概率
 const SNIFF_MIN_MS = 2000
 const SNIFF_MAX_MS = 6000
 const SNIFF_DURATION_MS = 1500
+
+const BODY_REACTIONS: BodyReaction[] = ['jump', 'spin', 'wag']
+const REACTION_MS = 1000 // 普通反应播放时长，播完回归状态机
+const ROLL_MS = 1800 // 连点彩蛋：慢速打滚一圈，时长比普通反应更长
+const STATIC_HEART_MS = 600 // reduced-motion 下静态 ❤️ 展示时长
+const TRIPLE_TAP_WINDOW_MS = 3000 // 连点彩蛋判定窗口
 
 /** 从排除当前状态的池中随机取下一个状态，避免连续重复同一动作。（无当日数据时的旧行为，均匀随机） */
 function nextState(current: DogState): DogState {
@@ -81,12 +90,16 @@ export interface DogBannerProps {
   sad?: boolean
 }
 
-/** 全局底部矮条（贴 tab 栏上方）：装饰性小狗，随机在跑动/打盹/吃东西/挠痒间切换，可按当日记录偏向。纯装饰，aria-hidden。 */
+/** 全局底部矮条（贴 tab 栏上方）：装饰性小狗，随机在跑动/打盹/吃东西/挠痒间切换，可按当日记录偏向；
+ * §D 狗本体可点，点击触发随机互动反应，打断当前状态播放约 1s 后回归状态机。 */
 export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
   const [reduced] = useState(prefersReducedMotion)
   const [state, setState] = useState<DogState>('run')
   const [phase, setPhase] = useState<'idle' | 'fading'>('idle')
   const [sniffing, setSniffing] = useState(false)
+  const [reaction, setReaction] = useState<Reaction | null>(null)
+  const reactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tapTimesRef = useRef<number[]>([]) // 连点彩蛋：滚动窗口内的点击时间戳
   const weightsRef = useRef<Record<DogState, number> | null>(null)
   weightsRef.current = todayDomains !== undefined ? pickStateWeights(todayDomains, sad) : null
   // React 的 setState(updater) 函数式写法把 updater 的执行推迟到渲染阶段，不是调用处同步执行；
@@ -146,24 +159,71 @@ export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
     }
   }, [state, phase, reduced])
 
+  // 反应播完后自动回归状态机；卸载时清理，避免 setState-after-unmount。
+  useEffect(() => {
+    return () => {
+      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current)
+    }
+  }, [])
+
+  const triggerReaction = (r: Reaction, durationMs: number) => {
+    if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current)
+    setReaction(r)
+    reactionTimerRef.current = setTimeout(() => {
+      setReaction(null)
+      reactionTimerRef.current = null
+    }, durationMs)
+  }
+
+  /** 点击狗本体：reduced-motion 下永远只弹静态 ❤️；否则连点 3 次（3s 内）触发慢速打滚彩蛋，
+   * 普通点击从 3 种反应里随机挑一种，均打断当前状态、播完回归状态机。 */
+  const handleDogClick = () => {
+    if (reduced) {
+      triggerReaction('heart-static', STATIC_HEART_MS)
+      return
+    }
+    const now = Date.now()
+    const recent = tapTimesRef.current.filter((t) => now - t < TRIPLE_TAP_WINDOW_MS)
+    recent.push(now)
+    tapTimesRef.current = recent
+    if (recent.length >= 3) {
+      tapTimesRef.current = []
+      triggerReaction('roll', ROLL_MS)
+      return
+    }
+    const pick = BODY_REACTIONS[Math.floor(pseudoRandom() * BODY_REACTIONS.length)]
+    triggerReaction(pick, REACTION_MS)
+  }
+
   if (reduced) {
     return (
       <div className="dog-banner dog-banner-static" aria-hidden="true">
-        <span className="dog dog-sit">🐕</span>
+        <span className="dog dog-sit" role="button" aria-label="小狗" onClick={handleDogClick}>
+          🐕
+          {reaction === 'heart-static' && <span className="dog-reaction-heart dog-reaction-heart-static">❤️</span>}
+        </span>
       </div>
     )
   }
 
+  // 反应播放期间整体替换 dog-${state}，打断当前状态的视觉（含淡出/嗅地），播完由 reaction=null 让下面的分支自然回归状态机。
   const outerClass = [
-    'dog', `dog-${state}`,
-    phase === 'fading' ? 'dog-fading' : '',
-    state === 'run' && sniffing ? 'dog-walk-paused' : '',
+    'dog',
+    reaction ? `dog-reaction-${reaction}` : `dog-${state}`,
+    !reaction && phase === 'fading' ? 'dog-fading' : '',
+    !reaction && state === 'run' && sniffing ? 'dog-walk-paused' : '',
   ].filter(Boolean).join(' ')
 
   return (
     <div className="dog-banner" aria-hidden="true">
-      <span className={outerClass}>
-        {state === 'run' ? (
+      <span className={outerClass} role="button" aria-label="小狗" onClick={handleDogClick}>
+        {reaction ? (
+          <>
+            🐕
+            {reaction === 'jump' && <span className="dog-reaction-heart">❤️</span>}
+            {reaction === 'wag' && <span className="dog-reaction-bubble">汪</span>}
+          </>
+        ) : state === 'run' ? (
           <span className={`dog-bob${sniffing ? ' dog-bob-paused' : ''}`}>
             <span className={`dog-body${sniffing ? ' dog-sniffing' : ''}`}>🐕</span>
           </span>

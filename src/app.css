@@ -153,8 +153,10 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 /* 贴 tab 栏正上方的固定窄条：tab 栏内容高度(padding 14px*2 + 文字约18px + 上边框1px)≈46px + safe-area。 */
 .dog-banner { position:fixed; left:0; right:0; bottom:calc(46px + env(safe-area-inset-bottom)); max-width:480px; margin:0 auto; width:100%; height:44px; overflow:hidden; pointer-events:none; background:var(--bg); z-index:5; }
 .dog-banner-static { display:flex; align-items:center; justify-content:center; opacity:.8; }
-.dog { position:absolute; bottom:4px; left:45%; font-size:24px; line-height:1; display:inline-block; opacity:1; transition:opacity 240ms var(--ease-out); }
-.dog-sit { position:static; font-size:22px; }
+/* §D 可互动：条其余区域仍穿透(pointer-events:none 继承自 .dog-banner)，狗本体单独恢复 pointer-events:auto 可点。
+   padding+等量负 margin 撑出 ≥44px 触控热区，同时不挪动 left/bottom 锚点算出的视觉位置。 */
+.dog { position:absolute; bottom:4px; left:45%; font-size:24px; line-height:1; display:inline-block; opacity:1; transition:opacity 240ms var(--ease-out); padding:10px; margin:-10px; pointer-events:auto; cursor:pointer; }
+.dog-sit { position:static; font-size:22px; padding:10px; pointer-events:auto; cursor:pointer; }
 /* 走：全宽匀速折返（left 4%↔84%，到边缘 scaleX 翻转，不瞬移），内嵌 .dog-bob 叠加 320ms/步的踏步起伏，两层各管一个 transform 互不冲突。 */
 .dog-run { animation:dog-run 9s linear infinite; }
 .dog-nap { animation:dog-bob 3s ease-in-out infinite; opacity:.9; }
@@ -173,6 +175,18 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .dog-bob-paused { animation-play-state:paused; }
 .dog-body.dog-sniffing { transform:rotate(-8deg); }
 
+/* §D 点击互动反应：三选一（跳跃冒心/原地转圈/摇尾汪汪泡泡），播放约 1s 后回归状态机；
+   反应期间整体替换 dog-${state} 类（打断当前姿态），故与 run/nap/eat/scratch 动画互斥、不叠加。 */
+.dog-reaction-jump { animation:dog-jump 1s var(--ease-out); }
+.dog-reaction-spin { animation:dog-spin 1s linear; }
+.dog-reaction-wag { animation:dog-wag 1s ease-in-out; }
+/* 连点彩蛋：3 秒内连点 3 次 → 慢速打滚一圈，时长比普通反应更长以体现「慢」。 */
+.dog-reaction-roll { animation:dog-roll 1.8s linear; }
+.dog-reaction-heart { position:absolute; top:-6px; left:50%; transform:translateX(-50%); font-size:14px; animation:dog-heart-float .9s ease-out; }
+/* reduced-motion 静态心：不参与任何 animation，600ms 后由 JS 直接卸载，纯显隐无位移。 */
+.dog-reaction-heart-static { animation:none; opacity:1; transform:translateX(-50%); }
+.dog-reaction-bubble { position:absolute; top:-18px; right:-6px; font-size:11px; font-weight:700; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:8px; padding:0 4px; animation:dog-bubble-fade .5s ease-out forwards; }
+
 @keyframes dog-run {
   0%   { left:4%;  transform:scaleX(1); }
   45%  { left:84%; transform:scaleX(1); }
@@ -184,6 +198,32 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 @keyframes dog-bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
 @keyframes dog-eat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
 @keyframes dog-scratch { 0%,100% { transform:rotate(0deg); } 25% { transform:rotate(-8deg); } 75% { transform:rotate(8deg); } }
+@keyframes dog-jump {
+  0%, 100% { transform:translateY(0); }
+  30% { transform:translateY(-12px); }
+  55% { transform:translateY(-12px); }
+  75% { transform:translateY(0); }
+}
+@keyframes dog-spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes dog-wag {
+  0%, 100% { transform:rotate(0deg); }
+  20% { transform:rotate(-14deg); }
+  40% { transform:rotate(14deg); }
+  60% { transform:rotate(-14deg); }
+  80% { transform:rotate(14deg); }
+}
+@keyframes dog-roll { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes dog-heart-float {
+  0% { opacity:0; transform:translate(-50%, 0) scale(.6); }
+  30% { opacity:1; transform:translate(-50%, -6px) scale(1); }
+  100% { opacity:0; transform:translate(-50%, -22px) scale(1); }
+}
+@keyframes dog-bubble-fade {
+  0% { opacity:0; }
+  15% { opacity:1; }
+  80% { opacity:1; }
+  100% { opacity:0; }
+}
 @keyframes dog-float { 0% { opacity:0; transform:translateY(0); } 40% { opacity:1; } 100% { opacity:0; transform:translateY(-10px); } }
 
 .train-actions { display:flex; gap:8px; margin-top:8px; }
