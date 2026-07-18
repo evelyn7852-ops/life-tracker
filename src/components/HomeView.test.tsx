@@ -77,6 +77,11 @@ describe('HomeView', () => {
     expect(await screen.findByText(`${now.getFullYear()}年${now.getMonth() + 1}月`)).toBeTruthy()
   })
 
+  it('日历标题行前有「本月」节奏标签', () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    expect(screen.getByText('本月')).toBeTruthy()
+  })
+
   it('渲染每日一句（含出处）', async () => {
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     expect(await screen.findByText(/——/)).toBeTruthy()
@@ -92,8 +97,8 @@ describe('HomeView', () => {
     fetchDailyImageMock.mockResolvedValue(null)
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     await waitFor(() => expect(fetchDailyImageMock).toHaveBeenCalled())
-    const box = document.querySelector('.home-image')
-    expect(box?.className).toContain('home-image-fallback')
+    const box = document.querySelector('.home-hero')
+    expect(box?.className).toContain('home-hero-fallback')
     expect(box?.querySelector('img')).toBeNull()
   })
 
@@ -101,9 +106,21 @@ describe('HomeView', () => {
     fetchDailyImageMock.mockResolvedValue({ url: 'https://cn.bing.com/x.jpg', copyright: 'c', sentence: null })
     render(<HomeView refreshKey={0} onSaved={() => {}} active />)
     await waitFor(() => {
-      const img = document.querySelector('.home-image img')
+      const img = document.querySelector('.home-hero img')
       expect(img).toBeTruthy()
     })
+  })
+
+  it('hero 出血块是 home-view 的第一个子元素', () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    const homeView = document.querySelector('.home-view')
+    expect(homeView?.firstElementChild?.className).toContain('home-hero-wrap')
+  })
+
+  it('hero 叠字层含日期', async () => {
+    render(<HomeView refreshKey={0} onSaved={() => {}} active />)
+    const overlay = document.querySelector('.home-hero-overlay')
+    expect(overlay?.textContent).toMatch(/\d{4}年\d{1,2}月\d{1,2}日 周[日一二三四五六]/)
   })
 
   it('图片含地点（copyright）→ 图片下方显示地点原文', async () => {

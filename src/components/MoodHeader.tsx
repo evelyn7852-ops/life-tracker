@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
-
-const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六']
+import { formatClock, weekdayZh } from '../lib/dateFormat'
 
 function formatDate(d: Date): string {
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  return `${d.getMonth() + 1}月${d.getDate()}日 周${WEEKDAY_ZH[d.getDay()]} ${hh}:${mm}`
+  return `${d.getMonth() + 1}月${d.getDate()}日 周${weekdayZh(d)} ${formatClock(d)}`
 }
 
 /** 记录 tab 顶部日期时钟；心情 emoji 行已迁至 HomeView（V1.2）。 */

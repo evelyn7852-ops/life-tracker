@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMood } from '../hooks/useMood'
 import { fetchDailyImage, type DailyImage } from '../lib/dailyImage'
+import { formatClock, weekdayZh } from '../lib/dateFormat'
 import { todayQuote } from '../lib/quote'
 import { currentQuarterTrips, listTrips, type TripRow } from '../lib/tripRepo'
 import { CalendarView } from './CalendarView'
@@ -11,16 +12,9 @@ import { TravelPlanView } from './TravelPlanView'
 type PlanOverlay = 'travel' | 'learning' | null
 
 const MOODS = ['😊', '😐', '😮‍💨', '🥳', '😢', '🤒']
-const WEEKDAY_ZH = ['日', '一', '二', '三', '四', '五', '六']
 
 function formatBigDate(d: Date): string {
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 周${WEEKDAY_ZH[d.getDay()]}`
-}
-
-function formatClock(d: Date): string {
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  return `${hh}:${mm}`
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 周${weekdayZh(d)}`
 }
 
 export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; onSaved: () => void; active: boolean }) {
@@ -59,14 +53,29 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
 
   return (
     <div className="view home-view">
-      <div className={`home-image ${showFallback ? 'home-image-fallback' : ''}`}>
-        {!showFallback && (
-          <img src={image!.url} alt={image!.copyright} onError={() => setImage(null)} />
-        )}
+      <div className="home-hero-wrap">
+        <div className={`home-hero ${showFallback ? 'home-hero-fallback' : ''}`}>
+          {!showFallback && (
+            <img src={image!.url} alt={image!.copyright} onError={() => setImage(null)} />
+          )}
+          <div className="home-hero-scrim" />
+          <div className="home-hero-overlay">
+            <div className="home-hero-date-row">
+              <p className="home-hero-date">{formatBigDate(now)}</p>
+              <p className="home-hero-clock">{formatClock(now)}</p>
+            </div>
+            {sentence ? (
+              <p className="home-hero-sentence one-line">{sentence}</p>
+            ) : (
+              <p className="home-hero-sentence one-line">{quote.text}</p>
+            )}
+            <div className="home-hero-meta">
+              {!showFallback && image!.copyright && <p className="home-hero-copyright">{image!.copyright}</p>}
+              {!sentence && <p className="home-hero-quote-author">—— {quote.author}</p>}
+            </div>
+          </div>
+        </div>
       </div>
-      {!showFallback && image!.copyright && <p className="home-copyright muted">{image!.copyright}</p>}
-      <p className="home-date">{formatBigDate(now)}</p>
-      <p className="home-clock muted">{formatClock(now)}</p>
       <div className="mood-row">
         {MOODS.map((emoji) => (
           <button
@@ -78,21 +87,12 @@ export function HomeView({ refreshKey, onSaved, active }: { refreshKey: number; 
           </button>
         ))}
       </div>
-      <div className="home-quote-card">
-        {sentence ? (
-          <p className="home-quote-text one-line">{sentence}</p>
-        ) : (
-          <>
-            <p className="home-quote-text">{quote.text}</p>
-            <p className="home-quote-author muted">—— {quote.author}</p>
-          </>
-        )}
-      </div>
       {quarterTrips.length > 0 && (
         <button className="card home-quarter-banner" onClick={() => setPlanOverlay('travel')}>
           📍 本季计划：{quarterTrips.map((t) => t.destination).join('、')}
         </button>
       )}
+      <p className="section-title">本月</p>
       <CalendarView active={active} />
       <StatsCard refreshKey={refreshKey} active={active} />
       <div className="plan-section">
