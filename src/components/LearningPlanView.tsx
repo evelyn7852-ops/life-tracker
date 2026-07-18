@@ -313,25 +313,19 @@ function BootcampArchive() {
 
 // ---------- 外层：分段切换 ----------
 
-export function LearningPlanView({ onClose }: { onClose: () => void }) {
+/** 学习规划：V1.7 起内嵌渲染在「规划」tab 的学习 segment 中（不再是可关闭的全屏 overlay）。 */
+export function LearningPlanView() {
   const [segment, setSegment] = useState<Segment>('stream')
 
   return (
-    <div className="day-detail-overlay" onClick={onClose}>
-      <div className="day-detail-sheet plan-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="day-detail-head">
-          <p className="day-detail-title">学习规划</p>
-          <button aria-label="关闭" className="day-detail-close" onClick={onClose}>✕</button>
-        </div>
-        <div className="summary-tabs">
-          <button className={segment === 'stream' ? 'on' : ''} onClick={() => setSegment('stream')}>学习流</button>
-          <button className={segment === 'archive' ? 'on' : ''} onClick={() => setSegment('archive')}>集训存档</button>
-        </div>
-        <div className="day-detail-body">
-          {segment === 'stream' && <StreamSection />}
-          {segment === 'archive' && <BootcampArchive />}
-        </div>
+    <div className="view">
+      <p className="view-title">学习规划</p>
+      <div className="summary-tabs">
+        <button className={segment === 'stream' ? 'on' : ''} onClick={() => setSegment('stream')}>学习流</button>
+        <button className={segment === 'archive' ? 'on' : ''} onClick={() => setSegment('archive')}>集训存档</button>
       </div>
+      {segment === 'stream' && <StreamSection />}
+      {segment === 'archive' && <BootcampArchive />}
     </div>
   )
 }

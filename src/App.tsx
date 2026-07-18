@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { AuthGate } from './components/AuthGate'
+import { CalendarView } from './components/CalendarView'
 import { DogBanner } from './components/DogBanner'
 import { HomeView } from './components/HomeView'
 import { MoodHeader } from './components/MoodHeader'
+import { PlanView } from './components/PlanView'
+import { QuarterBanner } from './components/QuarterBanner'
 import { QuickInput } from './components/QuickInput'
 import { ReviewView } from './components/ReviewView'
 import { TodayView } from './components/TodayView'
-import { TrainView } from './components/TrainView'
 import { listEntries } from './lib/entriesRepo'
 import { flushOutbox } from './lib/outbox'
 import type { Domain, JournalData } from './lib/types'
 
-type Tab = 'home' | 'today' | 'review' | 'train'
+type Tab = 'home' | 'today' | 'review' | 'plan'
 
 /** 当天 [00:00, 次日00:00) 范围，与 TodayView/useMood 同款写法。 */
 function dayRange(d = new Date()): { fromTs: string; toTs: string } {
@@ -58,20 +60,22 @@ export default function App() {
     <AuthGate>
       <div className="app">
         <main className="main">
-          <div hidden={tab !== 'home'}><HomeView refreshKey={refreshKey} onSaved={bump} active={tab === 'home'} /></div>
+          <div hidden={tab !== 'home'}><HomeView active={tab === 'home'} /></div>
           <div hidden={tab !== 'today'}>
-            <MoodHeader />
+            <MoodHeader refreshKey={refreshKey} onSaved={bump} active={tab === 'today'} />
             <QuickInput onSaved={bump} />
+            <QuarterBanner refreshKey={refreshKey} active={tab === 'today'} />
+            <CalendarView active={tab === 'today'} />
             <TodayView refreshKey={refreshKey} active={tab === 'today'} />
           </div>
           <div hidden={tab !== 'review'}><ReviewView refreshKey={refreshKey} active={tab === 'review'} /></div>
-          <div hidden={tab !== 'train'}><TrainView refreshKey={refreshKey} active={tab === 'train'} /></div>
+          <div hidden={tab !== 'plan'}><PlanView refreshKey={refreshKey} active={tab === 'plan'} /></div>
         </main>
         <DogBanner todayDomains={todayDomains} sad={sad} />
         <nav className="tabs">
-          {(['home', 'today', 'review', 'train'] as Tab[]).map((t) => (
+          {(['home', 'today', 'review', 'plan'] as Tab[]).map((t) => (
             <button key={t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
-              {{ home: '首页', today: '记录', review: '回顾', train: '训练' }[t]}
+              {{ home: '首页', today: '记录', review: '回顾', plan: '规划' }[t]}
             </button>
           ))}
         </nav>

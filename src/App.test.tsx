@@ -12,8 +12,10 @@ vi.mock('./components/HomeView', () => ({ HomeView: () => <div data-testid="home
 vi.mock('./components/ReviewView', () => ({ ReviewView: () => <div data-testid="review-view" /> }))
 vi.mock('./components/MoodHeader', () => ({ MoodHeader: () => <div data-testid="mood-header" /> }))
 vi.mock('./components/QuickInput', () => ({ QuickInput: () => <div data-testid="quick-input" /> }))
+vi.mock('./components/QuarterBanner', () => ({ QuarterBanner: () => <div data-testid="quarter-banner" /> }))
+vi.mock('./components/CalendarView', () => ({ CalendarView: () => <div data-testid="calendar-view" /> }))
 vi.mock('./components/TodayView', () => ({ TodayView: () => <div data-testid="today-view" /> }))
-vi.mock('./components/TrainView', () => ({ TrainView: () => <div data-testid="train-view" /> }))
+vi.mock('./components/PlanView', () => ({ PlanView: () => <div data-testid="plan-view" /> }))
 
 vi.mock('./lib/outbox', () => ({ flushOutbox: vi.fn().mockResolvedValue(0) }))
 
@@ -37,10 +39,11 @@ describe('App', () => {
     dogBannerPropsSpy.mockClear()
   })
 
-  it('底部 4 个 tab：首页/记录/回顾/训练（5→4 合并历史+周览）', () => {
+  it('底部 4 个 tab：首页/记录/回顾/规划（V1.7 训练并入规划）', () => {
     render(<App />)
-    const labels = screen.getAllByRole('button', { name: /^(首页|记录|回顾|训练)$/ }).map((b) => b.textContent)
-    expect(labels).toEqual(['首页', '记录', '回顾', '训练'])
+    const labels = screen.getAllByRole('button', { name: /^(首页|记录|回顾|规划)$/ }).map((b) => b.textContent)
+    expect(labels).toEqual(['首页', '记录', '回顾', '规划'])
+    expect(screen.queryByText('训练')).toBeNull()
     expect(screen.queryByText('历史')).toBeNull()
     expect(screen.queryByText('周览')).toBeNull()
   })
@@ -49,6 +52,22 @@ describe('App', () => {
     render(<App />)
     await userEvent.click(screen.getByText('回顾'))
     expect(screen.getByTestId('review-view')).toBeTruthy()
+  })
+
+  it('点击「记录」→ 渲染 MoodHeader/QuickInput/本季banner/日历/今日时间线', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByText('记录'))
+    expect(screen.getByTestId('mood-header')).toBeTruthy()
+    expect(screen.getByTestId('quick-input')).toBeTruthy()
+    expect(screen.getByTestId('quarter-banner')).toBeTruthy()
+    expect(screen.getByTestId('calendar-view')).toBeTruthy()
+    expect(screen.getByTestId('today-view')).toBeTruthy()
+  })
+
+  it('点击「规划」→ 渲染 PlanView', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByText('规划'))
+    expect(screen.getByTestId('plan-view')).toBeTruthy()
   })
 
   it('挂载后查询今日 entries', async () => {
@@ -65,8 +84,8 @@ describe('App', () => {
     await userEvent.click(screen.getByText('记录'))
     expect(screen.getByTestId('today-view')).toBeTruthy()
     expect(screen.getByTestId('dog-banner')).toBeTruthy()
-    await userEvent.click(screen.getByText('训练'))
-    expect(screen.getByTestId('train-view')).toBeTruthy()
+    await userEvent.click(screen.getByText('规划'))
+    expect(screen.getByTestId('plan-view')).toBeTruthy()
     expect(screen.getByTestId('dog-banner')).toBeTruthy()
   })
 

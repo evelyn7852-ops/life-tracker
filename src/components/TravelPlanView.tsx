@@ -181,7 +181,8 @@ function AddTripCard({ year, allTrips, onAdded, onCancel }: { year: number; allT
   )
 }
 
-export function TravelPlanView({ onClose }: { onClose: () => void }) {
+/** 旅行规划：V1.7 起内嵌渲染在「规划」tab 的旅行 segment 中（不再是可关闭的全屏 overlay）。 */
+export function TravelPlanView() {
   const currentYear = new Date().getFullYear()
   const [trips, setTrips] = useState<TripRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -218,24 +219,19 @@ export function TravelPlanView({ onClose }: { onClose: () => void }) {
   const quarterTrips = currentQuarterTrips(trips, new Date())
 
   return (
-    <div className="day-detail-overlay" onClick={onClose}>
-      <div className="day-detail-sheet plan-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="day-detail-head">
-          <p className="day-detail-title">旅行规划</p>
-          <button aria-label="关闭" className="day-detail-close" onClick={onClose}>✕</button>
+    <div className="view">
+      <p className="view-title">旅行规划</p>
+      <p className="muted plan-note">粒度为「五一/十一/圣诞」季度级，日历不做日级映射</p>
+      {quarterTrips.length > 0 && (
+        <div className="card trip-quarter-banner">
+          <p>📍 本季计划：{quarterTrips.map((t) => t.destination).join('、')}</p>
         </div>
-        <p className="muted plan-note">粒度为「五一/十一/圣诞」季度级，日历不做日级映射</p>
-        {quarterTrips.length > 0 && (
-          <div className="card trip-quarter-banner">
-            <p>📍 本季计划：{quarterTrips.map((t) => t.destination).join('、')}</p>
-          </div>
-        )}
-        <div className="day-detail-body">
-          {loading ? (
-            <p className="muted">行程加载中…</p>
-          ) : (
-            <>
-              {groups.map((g) => {
+      )}
+      {loading ? (
+        <p className="muted">行程加载中…</p>
+      ) : (
+        <>
+          {groups.map((g) => {
                 const open = openYears.has(g.year)
                 return (
                   <div key={g.year} className="card train-accordion">
@@ -301,10 +297,8 @@ export function TravelPlanView({ onClose }: { onClose: () => void }) {
                   </ul>
                 )}
               </div>
-            </>
-          )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }
