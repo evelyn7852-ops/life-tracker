@@ -195,10 +195,17 @@ export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
     triggerReaction(pick, REACTION_MS)
   }
 
+  const handleDogKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleDogClick()
+    }
+  }
+
   if (reduced) {
     return (
-      <div className="dog-banner dog-banner-static" aria-hidden="true">
-        <span className="dog dog-sit" role="button" aria-label="小狗" onClick={handleDogClick}>
+      <div className="dog-banner dog-banner-static">
+        <span className="dog dog-sit" role="button" aria-label="小狗" tabIndex={0} onClick={handleDogClick} onKeyDown={handleDogKeyDown}>
           🐕
           {reaction === 'heart-static' && <span className="dog-reaction-heart dog-reaction-heart-static">❤️</span>}
         </span>
@@ -215,8 +222,8 @@ export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
   ].filter(Boolean).join(' ')
 
   return (
-    <div className="dog-banner" aria-hidden="true">
-      <span className={outerClass} role="button" aria-label="小狗" onClick={handleDogClick}>
+    <div className="dog-banner">
+      <span className={outerClass} role="button" aria-label="小狗" tabIndex={0} onClick={handleDogClick} onKeyDown={handleDogKeyDown}>
         {reaction ? (
           <>
             🐕

@@ -35,9 +35,13 @@ describe('DogBanner', () => {
     expect(document.querySelector('.dog-run')).toBeTruthy()
   })
 
-  it('装饰性元素 aria-hidden，不干扰屏幕阅读器', () => {
+  it('小狗可交互：role=button + 键盘可聚焦，容器不再 aria-hidden', () => {
     render(<DogBanner />)
-    expect(document.querySelector('.dog-banner')?.getAttribute('aria-hidden')).toBe('true')
+    expect(document.querySelector('.dog-banner')?.getAttribute('aria-hidden')).toBeNull()
+    const dog = document.querySelector('.dog')
+    expect(dog?.getAttribute('role')).toBe('button')
+    expect(dog?.getAttribute('tabindex')).toBe('0')
+    expect(dog?.getAttribute('aria-label')).toBe('小狗')
   })
 
   it('prefers-reduced-motion → 渲染静态趴窝小狗，不设定时器、无动画类', () => {
