@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react'
 import { AuthGate } from './components/AuthGate'
 import { DogBanner } from './components/DogBanner'
-import { HistoryView } from './components/HistoryView'
 import { HomeView } from './components/HomeView'
 import { MoodHeader } from './components/MoodHeader'
 import { QuickInput } from './components/QuickInput'
+import { ReviewView } from './components/ReviewView'
 import { TodayView } from './components/TodayView'
 import { TrainView } from './components/TrainView'
-import { WeekView } from './components/WeekView'
 import { listEntries } from './lib/entriesRepo'
 import { flushOutbox } from './lib/outbox'
 import type { Domain, JournalData } from './lib/types'
 
-type Tab = 'home' | 'today' | 'history' | 'week' | 'train'
+type Tab = 'home' | 'today' | 'review' | 'train'
 
 /** 当天 [00:00, 次日00:00) 范围，与 TodayView/useMood 同款写法。 */
 function dayRange(d = new Date()): { fromTs: string; toTs: string } {
@@ -65,15 +64,14 @@ export default function App() {
             <QuickInput onSaved={bump} />
             <TodayView refreshKey={refreshKey} active={tab === 'today'} />
           </div>
-          <div hidden={tab !== 'history'}><HistoryView refreshKey={refreshKey} active={tab === 'history'} /></div>
-          <div hidden={tab !== 'week'}><WeekView refreshKey={refreshKey} active={tab === 'week'} /></div>
+          <div hidden={tab !== 'review'}><ReviewView refreshKey={refreshKey} active={tab === 'review'} /></div>
           <div hidden={tab !== 'train'}><TrainView refreshKey={refreshKey} active={tab === 'train'} /></div>
         </main>
         <DogBanner todayDomains={todayDomains} sad={sad} />
         <nav className="tabs">
-          {(['home', 'today', 'history', 'week', 'train'] as Tab[]).map((t) => (
+          {(['home', 'today', 'review', 'train'] as Tab[]).map((t) => (
             <button key={t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
-              {{ home: '首页', today: '记录', history: '历史', week: '周览', train: '训练' }[t]}
+              {{ home: '首页', today: '记录', review: '回顾', train: '训练' }[t]}
             </button>
           ))}
         </nav>

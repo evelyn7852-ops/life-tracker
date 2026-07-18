@@ -9,12 +9,11 @@ vi.mock('./components/AuthGate', () => ({
 
 // 各 tab 视图内部逻辑各自有测试覆盖，这里全部替身为占位组件，避免重复 mock 一整套依赖链。
 vi.mock('./components/HomeView', () => ({ HomeView: () => <div data-testid="home-view" /> }))
-vi.mock('./components/HistoryView', () => ({ HistoryView: () => <div data-testid="history-view" /> }))
+vi.mock('./components/ReviewView', () => ({ ReviewView: () => <div data-testid="review-view" /> }))
 vi.mock('./components/MoodHeader', () => ({ MoodHeader: () => <div data-testid="mood-header" /> }))
 vi.mock('./components/QuickInput', () => ({ QuickInput: () => <div data-testid="quick-input" /> }))
 vi.mock('./components/TodayView', () => ({ TodayView: () => <div data-testid="today-view" /> }))
 vi.mock('./components/TrainView', () => ({ TrainView: () => <div data-testid="train-view" /> }))
-vi.mock('./components/WeekView', () => ({ WeekView: () => <div data-testid="week-view" /> }))
 
 vi.mock('./lib/outbox', () => ({ flushOutbox: vi.fn().mockResolvedValue(0) }))
 
@@ -36,6 +35,20 @@ describe('App', () => {
   beforeEach(() => {
     listEntriesMock.mockReset().mockResolvedValue([])
     dogBannerPropsSpy.mockClear()
+  })
+
+  it('底部 4 个 tab：首页/记录/回顾/训练（5→4 合并历史+周览）', () => {
+    render(<App />)
+    const labels = screen.getAllByRole('button', { name: /^(首页|记录|回顾|训练)$/ }).map((b) => b.textContent)
+    expect(labels).toEqual(['首页', '记录', '回顾', '训练'])
+    expect(screen.queryByText('历史')).toBeNull()
+    expect(screen.queryByText('周览')).toBeNull()
+  })
+
+  it('点击「回顾」→ 渲染 ReviewView，active=true', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByText('回顾'))
+    expect(screen.getByTestId('review-view')).toBeTruthy()
   })
 
   it('挂载后查询今日 entries', async () => {
