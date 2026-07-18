@@ -1,11 +1,12 @@
 :root {
-  --bg:#f6f8fe; --card:#fff; --ink:#1a1a1a; --muted:#8a8578; --accent:#2B5CE6; --line:#e3e8f8; --klein:#002FA5;
+  /* V1.7 §E 布达佩斯大饭店主题：粉底承载表面（Committed 策略），配色 token 钉死。 */
+  --bg:#F5E3DF; --card:#FDF6F1; --ink:#3D2C3C; --muted:#8E7183; --accent:#A34E64; --gold:#C99334; --mint:#8FB39E; --line:#E7C9C4;
   --ease-out: cubic-bezier(.22,.61,.36,1);
   --dur: 180ms;               /* 状态转换标准时长 150-250ms 区间 */
   --radius-card: 16px;
   --radius-btn: 12px;
-  --shadow-card: 0 1px 3px rgba(20,40,120,.07);
-  --scrim: linear-gradient(180deg, rgba(0,10,40,0) 38%, rgba(0,10,40,.62) 100%);
+  --shadow-card: 0 1px 2px rgba(61,44,60,.05);
+  --scrim: linear-gradient(180deg, rgba(40,20,35,0) 38%, rgba(40,20,35,.62) 100%);
   /* z-index 语义梯：content 1 / dog 5 / sticky 10 / tabs 10 / overlay-backdrop 20 / sheet 21 */
 }
 * { box-sizing:border-box; margin:0; }
@@ -68,15 +69,20 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .tabs { position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto; display:flex; background:var(--card); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:10; }
 .tabs button { flex:1; padding:14px 0; border:none; background:none; font-size:14px; color:var(--muted); }
 .tabs button.on { color:var(--accent); font-weight:600; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card); box-shadow:var(--shadow-card); padding:14px 16px; position:relative; }
+/* 画框卡（韦斯签名框中框）：border + 内描线 outline 双层描边，投影撤销，画框感>浮起感。
+   padding 14/16 与 outline-offset -5px 之间留有余量，内描线不会裁到内容。 */
+.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card); outline:1px solid var(--line); outline-offset:-5px; box-shadow:none; padding:14px 16px; position:relative; }
 .card-head { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); margin-bottom:6px; }
 .card-text { font-size:15px; }
 .card-edit { display:flex; gap:6px; }
 .card-edit input { flex:1; padding:8px; border:1px solid var(--line); border-radius:8px; }
 .card-del { position:absolute; right:10px; bottom:10px; border:none; background:none; color:var(--muted); font-size:12px; padding:16px; margin:-16px; }
+/* §E 训练卡「已完成」态：同 .plan-trip-done 的薄荷徽标处理，ink-on-mint 达标。 */
+.card-time.badge-done { background:var(--mint); color:var(--ink); font-weight:600; padding:2px 8px; border-radius:999px; }
 .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-.dot-food{background:#FFB020}.dot-workout{background:#2B5CE6}.dot-travel{background:#00B8D9}
-.dot-reading{background:#9B51E0}.dot-journal{background:#7A869A}.dot-learning{background:#36B37E}
+/* §E 域点转谱：food 芥末/workout 树莓 直接复用根 token，其余三域为域专属色，非根 token。 */
+.dot-food{background:var(--gold)}.dot-workout{background:var(--accent)}.dot-travel{background:#5E9291}
+.dot-reading{background:#7E5A8C}.dot-journal{background:#9C8B95}.dot-learning{background:#7C9A62}
 .day-dots { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px; }
 .day-dot { font-size:12px; padding:4px 10px; border-radius:999px; border:1px dashed var(--line); color:var(--muted); }
 .day-dot.on { border-style:solid; color:var(--ink); }
@@ -93,21 +99,22 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .home-view { align-items:center; padding-top:0; gap:6px; }
 
 /* 沉浸式 hero：负外边距抵消 .main 的 12px/16px 内衬，出血到视口顶部与左右边缘；
-   safe-area-top 作内衬（klein 底色垫在刘海/状态栏之下，避免图片被硬裁）。 */
-.home-hero-wrap { align-self:stretch; margin:-12px -16px 0; padding-top:env(safe-area-inset-top); background:var(--klein); }
-.home-hero { position:relative; height:clamp(60vh, 68vh, 560px); overflow:hidden; background:var(--klein); }
+   safe-area-top 作内衬（§E klein 废弃，兜底底色改李子紫 --ink，垫在刘海/状态栏之下，避免图片被硬裁）。 */
+.home-hero-wrap { align-self:stretch; margin:-12px -16px 0; padding-top:env(safe-area-inset-top); background:var(--ink); }
+.home-hero { position:relative; height:clamp(60vh, 68vh, 560px); overflow:hidden; background:var(--ink); }
 .home-hero img { width:100%; height:100%; object-fit:cover; display:block; }
-.home-hero-fallback { background:var(--klein); }
+.home-hero-fallback { background:var(--ink); }
 .home-hero-scrim { position:absolute; inset:0; background:var(--scrim); pointer-events:none; }
-.home-hero-overlay { position:absolute; left:0; right:0; bottom:0; padding:14px 16px 12px; display:flex; flex-direction:column; gap:4px; color:#fff; }
+/* §E 对称：封面日期居中排版。 */
+.home-hero-overlay { position:absolute; left:0; right:0; bottom:0; padding:14px 16px 12px; display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; text-align:center; }
 /* 日期放大到 34px 后与时钟同行易挤到换行（CJK 逐字换行会截断词组），故时钟改落一行，
    日期独占整行宽度、单行显示。 */
-.home-hero-date-row { display:flex; flex-direction:column; gap:2px; }
+.home-hero-date-row { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
 .home-hero-date { font-size:34px; font-weight:800; }
 .home-hero-clock { font-size:12px; color:rgba(255,255,255,.85); }
-.home-hero-sentence { font-size:16px; color:rgba(255,255,255,.92); }
+.home-hero-sentence { font-size:16px; color:rgba(255,255,255,.92); width:100%; }
 .home-hero-sentence.one-line { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.home-hero-meta { display:flex; flex-direction:column; gap:2px; }
+.home-hero-meta { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
 .home-hero-copyright, .home-hero-quote-author { font-size:10px; color:rgba(255,255,255,.6); }
 
 .cal { width:100%; border-top:1px solid var(--line); margin-top:2px; padding-top:10px; }
@@ -134,7 +141,8 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .day-detail-body { display:flex; flex-direction:column; gap:8px; }
 
 .summary-section { border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
-.section-title { font-size:13px; font-weight:600; color:var(--muted); margin-top:20px; margin-bottom:8px; }
+/* §E 对称：分区标题居中 + 字距展开。 */
+.section-title { font-size:13px; font-weight:600; color:var(--muted); margin-top:20px; margin-bottom:8px; text-align:center; letter-spacing:.06em; }
 .summary-tabs { display:flex; gap:8px; margin-bottom:8px; }
 .summary-tabs button { padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:13px; color:var(--muted); }
 .summary-tabs button.on { border-color:var(--accent); color:var(--accent); font-weight:600; }
@@ -197,7 +205,10 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .train-generate .train-actions { flex-wrap:wrap; justify-content:center; }
 
 .stats-card { width:100%; margin-top:10px; display:flex; flex-direction:column; gap:10px; }
-.stats-streak { font-size:16px; font-weight:700; }
+.stats-streak { font-size:14px; display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+/* §E streak 高亮：芥末金实心徽标 + 墨色字（ink-on-gold ≈4.75:1，达标），而非金字直接铺正文——
+   纯金字对卡面对比度不足 4.5:1，故以徽标承载「高亮」诉求。 */
+.streak-highlight { background:var(--gold); color:var(--ink); font-weight:700; font-size:14px; padding:3px 10px; border-radius:999px; }
 .stats-domains { display:flex; flex-wrap:wrap; gap:8px; }
 .stats-domain-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:999px; background:var(--bg); font-size:12px; color:var(--muted); }
 .stats-mood-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
@@ -210,7 +221,8 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .plan-trip-card { border-top:1px solid var(--line); padding-top:8px; }
 .plan-trip-card:first-child { border-top:none; padding-top:0; }
 .plan-trip-head { display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--muted); }
-.plan-trip-done { color:var(--accent); font-weight:700; }
+/* §E done 态用薄荷；同理以实心徽标承载（ink-on-mint ≈5.61:1，达标；裸薄荷字 on 卡面仅 2.15:1，不达标）。 */
+.plan-trip-done { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; background:var(--mint); color:var(--ink); font-weight:700; font-size:11px; border-radius:999px; }
 .plan-excluded { padding:0 10px 10px; line-height:1.7; }
 .plan-check-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
 .plan-check-list label { display:flex; align-items:flex-start; gap:8px; font-size:14px; cursor:pointer; }
@@ -221,8 +233,9 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .plan-week-body { padding:0 10px 10px; display:flex; flex-direction:column; gap:12px; }
 .plan-week-section-title { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
 
-.trip-quarter-banner { background:#eef3ff; border-color:var(--accent); }
-.home-quarter-banner { width:100%; text-align:left; background:#eef3ff; border-color:var(--accent); color:var(--ink); font-size:14px; }
+/* §E 旧蓝调 banner 底retint为粉调（树莓 8% 透明度叠于奶油卡面），呼应整体配色。 */
+.trip-quarter-banner { background:rgba(163,78,100,.08); border-color:var(--accent); }
+.home-quarter-banner { width:100%; text-align:left; background:rgba(163,78,100,.08); border-color:var(--accent); color:var(--ink); font-size:14px; }
 .trip-status-badge { color:var(--muted); font-size:12px; }
 .trip-edit-card { display:flex; flex-direction:column; gap:6px; padding:10px; }
 .trip-edit-card input, .trip-edit-card select { width:100%; padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
@@ -230,7 +243,8 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .trip-edit-row input { flex:1; }
 .trip-edit-row label { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); white-space:nowrap; }
 .trip-edit-row label input { width:80px; }
-.trip-conflict-hint { color:#b3720a; font-size:12px; }
+/* 警示色（冲突提示/同步提示）：旧橙黄偏离新暖粉盘，加深至 5.47:1 保证可读，同时不与 --gold 高亮混淆。 */
+.trip-conflict-hint { color:#8C5A12; font-size:12px; }
 .trip-add-row { padding:0 10px 10px; }
 .trip-add-btn { width:100%; padding:8px; border:1px dashed var(--line); border-radius:10px; background:none; color:var(--accent); font-size:13px; }
 
@@ -239,4 +253,4 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .stream-item-link { display:inline-flex; align-items:center; font-size:13px; color:var(--ink); margin-bottom:4px; padding:4px 10px; border:1px solid var(--line); border-radius:999px; background:transparent; }
 .stream-status-switch { margin-top:6px; margin-bottom:0; }
 .stream-status-switch button:disabled { opacity:1; }
-.stream-sync-hint { color:#b3720a; }
+.stream-sync-hint { color:#8C5A12; }

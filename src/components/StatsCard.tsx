@@ -68,7 +68,10 @@ export function StatsCard({ refreshKey, active }: { refreshKey: number; active: 
 
   return (
     <div className="card stats-card">
-      <p className="stats-streak">🔥 连续 {streak} 天 <span className="muted">· 本月 {monthEntries.length} 条</span></p>
+      <p className="stats-streak">
+        <span className="streak-highlight">🔥 连续 {streak} 天</span>
+        <span className="muted">· 本月 {monthEntries.length} 条</span>
+      </p>
       <div className="stats-domains">
         {ALL_DOMAINS.map((d) => (
           <span key={d} className="stats-domain-chip">

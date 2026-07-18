@@ -114,7 +114,7 @@ function TodayPlan({ rows, loading, onArchive, onDelete, onScheduled }: {
         <div key={w.id} className="card">
           <div className="card-head">
             <span className="card-domain">{w.title}</span>
-            <span className="card-time">{w.status === 'done' ? '已完成' : '计划中'}</span>
+            <span className={`card-time${w.status === 'done' ? ' badge-done' : ''}`}>{w.status === 'done' ? '已完成' : '计划中'}</span>
           </div>
           <p className="card-text">{w.blocks.map(blockLabel).join('，')}</p>
           {w.status !== 'done' && (
