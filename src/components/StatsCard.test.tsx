@@ -52,6 +52,14 @@ describe('StatsCard', () => {
     expect(await screen.findByText(/🔥.*连续.*3.*天/)).toBeTruthy()
   })
 
+  it('显示本月计数（回顾-周览合并数据点，紧邻 streak）', async () => {
+    listEntriesMock.mockResolvedValue([
+      foodEntry(new Date().toISOString()),
+    ])
+    render(<StatsCard refreshKey={0} active />)
+    expect(await screen.findByText(/本月.*1.*条/)).toBeTruthy()
+  })
+
   it('显示本月各域计数色块', async () => {
     render(<StatsCard refreshKey={0} active />)
     await waitFor(() => expect(listEntriesMock).toHaveBeenCalled())

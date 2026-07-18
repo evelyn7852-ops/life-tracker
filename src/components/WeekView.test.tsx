@@ -3,7 +3,14 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const listEntriesMock = vi.fn()
-vi.mock('../lib/entriesRepo', () => ({ listEntries: (o: unknown) => listEntriesMock(o) }))
+const countEntriesMock = vi.fn()
+vi.mock('../lib/entriesRepo', () => ({
+  listEntries: (o: unknown) => listEntriesMock(o),
+  countEntries: (f: string, t: string) => countEntriesMock(f, t),
+}))
+
+const listWorkoutsMock = vi.fn()
+vi.mock('../lib/workoutRepo', () => ({ listWorkouts: (o: unknown) => listWorkoutsMock(o) }))
 
 const getSummaryMock = vi.fn()
 const generateSummaryMock = vi.fn()
@@ -44,6 +51,8 @@ describe('weekRangeLabel 范围标注', () => {
 describe('WeekView AI 总结', () => {
   beforeEach(() => {
     listEntriesMock.mockReset().mockResolvedValue([])
+    countEntriesMock.mockReset().mockResolvedValue(0)
+    listWorkoutsMock.mockReset().mockResolvedValue([])
     getSummaryMock.mockReset()
     generateSummaryMock.mockReset()
   })
@@ -124,9 +133,11 @@ describe('WeekView AI 总结', () => {
   })
 })
 
-describe('WeekView 顶部 streak + 本月计数条', () => {
+describe('WeekView 顶部统计卡（V1.7 与首页 StatsCard 合并，含 streak + 本月计数）', () => {
   beforeEach(() => {
     listEntriesMock.mockReset().mockResolvedValue([])
+    countEntriesMock.mockReset().mockResolvedValue(0)
+    listWorkoutsMock.mockReset().mockResolvedValue([])
     getSummaryMock.mockReset().mockResolvedValue(null)
     generateSummaryMock.mockReset()
   })

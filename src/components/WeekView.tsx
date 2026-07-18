@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { listEntries } from '../lib/entriesRepo'
 import { generateSummary, getSummary, type PeriodType, type Summary } from '../lib/summaryRepo'
-import { computeStreak } from '../lib/stats'
 import { ALL_DOMAINS, DOMAIN_LABEL, type Entry } from '../lib/types'
+import { StatsCard } from './StatsCard'
 
 const STREAK_LOOKBACK_DAYS = 60 // 覆盖当月 + 足够判断连续记录天数
 
@@ -102,10 +102,6 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
 
   const wStart = weekStart()
   const weekRows = rows.filter((r) => new Date(r.ts) >= wStart)
-  const mStart = monthStart()
-  const monthRows = rows.filter((r) => new Date(r.ts) >= mStart)
-  const entryDates = [...new Set(rows.map((r) => toDateStr(new Date(r.ts))))]
-  const streak = computeStreak(entryDates, new Date())
 
   const counts = ALL_DOMAINS.map((d) => ({ d, n: weekRows.filter((r) => r.domain === d).length }))
   const max = Math.max(1, ...counts.map((c) => c.n))
@@ -114,10 +110,8 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
 
   return (
     <div className="view">
-      <div className="card week-stats-strip">
-        <span>🔥 连续 {streak} 天</span>
-        <span className="muted">本月 {monthRows.length} 条</span>
-      </div>
+      {/* 统计卡（V1.7 从首页迁来），与原周览顶部 streak 条合并为一张卡，避免重复展示 streak/本月计数。 */}
+      <StatsCard refreshKey={refreshKey} active={active} />
       <p className="view-title">周览 {weekRangeLabel()}</p>
       {loading && rows.length === 0 ? (
         <p className="muted empty">加载中…</p>
