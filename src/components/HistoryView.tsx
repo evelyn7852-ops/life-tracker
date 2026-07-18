@@ -54,7 +54,7 @@ export function HistoryView({ refreshKey, active }: { refreshKey: number; active
         <button className="more" onClick={() => load(false, rows[rows.length - 1].ts)}>加载更多</button>
       )}
       {loading && rows.length === 0 && <p className="muted empty">加载中…</p>}
-      {!loading && rows.length === 0 && <p className="muted empty">没有记录</p>}
+      {!loading && rows.length === 0 && <p className="muted empty">📭 没有记录</p>}
     </div>
   )
 }

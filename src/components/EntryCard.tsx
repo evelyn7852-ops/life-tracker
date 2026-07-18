@@ -31,8 +31,8 @@ export function EntryCard({ entry, onChanged, readOnly }: { entry: Entry; onChan
       {editing ? (
         <div className="card-edit">
           <input value={text} onChange={(e) => setText(e.target.value)} />
-          <button onClick={saveEdit}>存</button>
-          <button onClick={() => setEditing(false)}>取消</button>
+          <button className="btn-primary" onClick={saveEdit}>存</button>
+          <button className="btn-secondary" onClick={() => setEditing(false)}>取消</button>
         </div>
       ) : (
         <p className="card-text" onClick={() => !readOnly && setEditing(true)}>{entry.raw_text}</p>

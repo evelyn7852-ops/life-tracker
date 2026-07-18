@@ -48,8 +48,8 @@ function AddResourceForm({ onAdded, onCancel }: { onAdded: () => void; onCancel:
       <input placeholder="标签" value={draft.tag} onChange={(e) => setDraft({ ...draft, tag: e.target.value })} />
       <input placeholder="备注" value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value })} />
       <div className="card-edit">
-        <button onClick={save}>存</button>
-        <button onClick={onCancel}>取消</button>
+        <button className="btn-primary" onClick={save}>存</button>
+        <button className="btn-secondary" onClick={onCancel}>取消</button>
       </div>
     </div>
   )
@@ -140,7 +140,7 @@ function StreamSection() {
         <div key={s} className="plan-week-section">
           <p className="plan-week-section-title">{s}（{grouped[s].length}）</p>
           {grouped[s].length === 0
-            ? <p className="muted">暂无</p>
+            ? <p className="muted">📭 暂无</p>
             : grouped[s].map((item) => (
               <StreamItemCard key={item.id} item={item} onStatusChange={changeStatus} onDelete={remove} />
             ))}

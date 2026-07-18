@@ -86,7 +86,7 @@ function GenerateEmptyState({ onScheduled }: { onScheduled: () => void }) {
     <div className="train-generate">
       <div className="train-actions">
         {GENERATE_DIRECTIONS.map((d) => (
-          <button key={d.key} onClick={() => handleGenerate(d.key)} disabled={busy !== null}>
+          <button key={d.key} className="btn-primary" onClick={() => handleGenerate(d.key)} disabled={busy !== null}>
             {busy === d.key ? '生成中…' : d.label}
           </button>
         ))}
@@ -106,7 +106,7 @@ function TodayPlan({ rows, loading, onArchive, onDelete, onScheduled }: {
       {loading && rows.length === 0 && <p className="muted empty">加载中…</p>}
       {!loading && rows.length === 0 && (
         <>
-          <p className="muted empty">今天还没有排课，去课表库选一个吧</p>
+          <p className="muted empty">🐾 今天还没有排课，去课表库选一个吧</p>
           <GenerateEmptyState onScheduled={onScheduled} />
         </>
       )}
@@ -119,7 +119,7 @@ function TodayPlan({ rows, loading, onArchive, onDelete, onScheduled }: {
           <p className="card-text">{w.blocks.map(blockLabel).join('，')}</p>
           {w.status !== 'done' && (
             <div className="train-actions">
-              <button onClick={() => onArchive(w)}>完成</button>
+              <button className="btn-primary" onClick={() => onArchive(w)}>完成</button>
               <button className="card-del" onClick={() => onDelete(w.id)}>删</button>
             </div>
           )}
@@ -154,8 +154,8 @@ function ScheduleForm({ initialBlocks, onCancel, onConfirm }: {
         ))}
       </ul>
       <div className="train-actions">
-        <button onClick={() => onConfirm(date, blocks)} disabled={blocks.length === 0}>确认排课</button>
-        <button onClick={onCancel}>取消</button>
+        <button className="btn-primary" onClick={() => onConfirm(date, blocks)} disabled={blocks.length === 0}>确认排课</button>
+        <button className="btn-secondary" onClick={onCancel}>取消</button>
       </div>
     </div>
   )
@@ -194,7 +194,7 @@ function TemplateLibrary({ onScheduled }: { onScheduled: () => void }) {
             />
           ) : (
             <div className="train-actions">
-              <button onClick={() => setSchedulingId(t.id)} disabled={savingId === t.id}>排入</button>
+              <button className="btn-primary" onClick={() => setSchedulingId(t.id)} disabled={savingId === t.id}>排入</button>
             </div>
           )}
         </div>

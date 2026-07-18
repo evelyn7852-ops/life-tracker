@@ -114,13 +114,15 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
 
   return (
     <div className="view">
-      <div className="week-stats-strip">
+      <div className="card week-stats-strip">
         <span>🔥 连续 {streak} 天</span>
         <span className="muted">本月 {monthRows.length} 条</span>
       </div>
       <p className="view-title">周览 {weekRangeLabel()}</p>
       {loading && rows.length === 0 ? (
         <p className="muted empty">加载中…</p>
+      ) : weekRows.length === 0 ? (
+        <p className="muted empty">🐾 本周还没有记录</p>
       ) : (
         <>
           <p className="muted">本周记录 {weekRows.length} 条 · 活跃 {days.size} 天</p>
@@ -148,13 +150,13 @@ export function WeekView({ refreshKey, active }: { refreshKey: number; active: b
               {summary.content.split('\n').filter((line) => line.trim()).map((line, i) => <p key={i}>{line}</p>)}
             </div>
             <div className="summary-actions">
-              <button onClick={handleGenerate}>重新生成</button>
+              <button className="btn-primary" onClick={handleGenerate}>重新生成</button>
             </div>
           </>
         )}
         {!summaryLoading && !generating && !summary && (
           <div className="summary-empty">
-            <button onClick={handleGenerate}>生成{periodLabel}总结</button>
+            <button className="btn-primary" onClick={handleGenerate}>生成{periodLabel}总结</button>
           </div>
         )}
         {summaryError && <p className="muted">{summaryError}</p>}

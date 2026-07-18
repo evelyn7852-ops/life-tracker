@@ -62,12 +62,12 @@ export function QuickInput({ onSaved }: { onSaved: () => void }) {
         <div className="qi-preview">
           <span className="chip chip-domain">{DOMAIN_LABEL[result.domain]}</span>
           <span className="qi-summary">{summarize(result)}</span>
-          <button onClick={() => save(result)}>保存</button>
+          <button className="btn-primary" onClick={() => save(result)}>保存</button>
         </div>
       )}
       {text.trim() && !result && (
         <div className="qi-preview">
-          <button onClick={runLlm} disabled={llmBusy}>{llmBusy ? '解析中…' : 'AI 解析'}</button>
+          <button className="chip" onClick={runLlm} disabled={llmBusy}>{llmBusy ? '解析中…' : 'AI 解析'}</button>
           {ALL_DOMAINS.map((d) => (
             <button key={d} className="chip" onClick={() => save(null, d)}>{DOMAIN_LABEL[d]}</button>
           ))}

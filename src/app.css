@@ -14,6 +14,34 @@ button, .card-text, .day-dot { touch-action:manipulation; -webkit-tap-highlight-
 button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .app { max-width:480px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column; }
 
+/* §C 状态齐全：所有可点元素统一 focus-visible / disabled / 转场，覆盖按钮/chip/卡片。 */
+button, a, input, select, .day-dot, .card-text {
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out);
+}
+.card { transition: box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:0ms !important; transition-duration:0ms !important; }
+}
+
+/* §C 按钮两级：primary = 强调色填充 CTA；secondary = 描边 chip，透明底。 */
+.btn-primary {
+  height:40px; padding:0 20px; border:none; border-radius:var(--radius-btn);
+  background:var(--accent); color:#fff; font-size:14px; font-weight:600;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.btn-secondary {
+  height:40px; padding:0 16px; border:1px solid var(--line); border-radius:var(--radius-btn);
+  background:transparent; color:var(--ink); font-size:14px;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.btn-muted {
+  border:none; background:none; color:var(--muted); font-size:13px; padding:6px 10px;
+}
+
 .auth { max-width:320px; margin:30dvh auto 0; display:flex; flex-direction:column; gap:12px; padding:0 16px; }
 .auth input, .auth button { padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; }
 .auth button { background:var(--accent); color:#fff; border:none; }
@@ -31,7 +59,6 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .chip { padding:4px 10px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:13px; }
 .chip-domain { background:var(--accent); color:#fff; border:none; }
 .qi-summary { font-size:13px; color:var(--muted); flex:1; }
-.qi-preview button:not(.chip) { padding:6px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; }
 
 /* main padding-bottom 需清开两层固定元素：狗条(44px) + tab 栏(内容约46px + safe-area) + 12px 缓冲 = 102px 基础，
    四舍五入取 116px（对齐设计稿估算），另加 env(safe-area-inset-bottom) 覆盖底部有安全区的机型。 */
@@ -41,7 +68,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .tabs { position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto; display:flex; background:var(--card); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:10; }
 .tabs button { flex:1; padding:14px 0; border:none; background:none; font-size:14px; color:var(--muted); }
 .tabs button.on { color:var(--accent); font-weight:600; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; position:relative; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card); box-shadow:var(--shadow-card); padding:14px 16px; position:relative; }
 .card-head { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); margin-bottom:6px; }
 .card-text { font-size:15px; }
 .card-edit { display:flex; gap:6px; }
@@ -55,8 +82,8 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .day-dot.on { border-style:solid; color:var(--ink); }
 .empty { text-align:center; padding:32px 0; }
 .day-header { font-size:13px; color:var(--muted); margin:12px 0 6px; font-weight:500; }
-.more { margin:8px auto; padding:8px 24px; border:1px solid var(--line); border-radius:999px; background:var(--card); }
-.week-stats-strip { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; background:var(--card); border:1px solid var(--line); border-radius:12px; font-size:13px; font-weight:600; }
+.more { margin:8px auto; height:40px; padding:0 24px; border:1px solid var(--line); border-radius:var(--radius-btn); background:transparent; color:var(--ink); font-size:14px; }
+.week-stats-strip { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; font-weight:600; }
 .bar-row { display:flex; align-items:center; gap:10px; }
 .bar-label { width:36px; font-size:13px; }
 .bar-track { flex:1; height:14px; background:var(--card); border-radius:7px; overflow:hidden; }
@@ -107,14 +134,13 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .day-detail-body { display:flex; flex-direction:column; gap:8px; }
 
 .summary-section { border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
-.section-title { font-size:13px; font-weight:600; margin-bottom:8px; }
+.section-title { font-size:13px; font-weight:600; color:var(--muted); margin-top:20px; margin-bottom:8px; }
 .summary-tabs { display:flex; gap:8px; margin-bottom:8px; }
 .summary-tabs button { padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:13px; color:var(--muted); }
 .summary-tabs button.on { border-color:var(--accent); color:var(--accent); font-weight:600; }
-.summary-content { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; font-size:14px; line-height:1.7; }
+.summary-content { background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card); box-shadow:var(--shadow-card); padding:14px 16px; font-size:14px; line-height:1.7; }
 .summary-content p + p { margin-top:8px; }
 .summary-actions { margin-top:8px; }
-.summary-actions button, .summary-empty button { padding:8px 16px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
 
 /* 贴 tab 栏正上方的固定窄条：tab 栏内容高度(padding 14px*2 + 文字约18px + 上边框1px)≈46px + safe-area。 */
 .dog-banner { position:fixed; left:0; right:0; bottom:calc(46px + env(safe-area-inset-bottom)); max-width:480px; margin:0 auto; width:100%; height:44px; overflow:hidden; pointer-events:none; background:var(--bg); z-index:5; }
@@ -145,8 +171,6 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 }
 
 .train-actions { display:flex; gap:8px; margin-top:8px; }
-.train-actions button { padding:6px 14px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; }
-.train-actions button.card-del { background:none; color:var(--muted); padding:6px 10px; }
 .train-schedule { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
 .train-date-label { display:flex; flex-direction:column; gap:4px; font-size:13px; color:var(--muted); }
 .train-date-label input { padding:8px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
@@ -158,7 +182,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 .train-exercise-detail ul { padding-left:18px; font-size:13px; line-height:1.7; }
 .train-exercise-detail a { display:inline-block; margin-top:8px; color:var(--accent); font-size:13px; }
 .train-accordion { padding:0; overflow:hidden; }
-.train-accordion-head { width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:none; background:none; text-align:left; font-size:15px; }
+.train-accordion-head { width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:none; background:none; text-align:left; font-size:15px; }
 .train-accordion .train-exercise-list { padding:0 10px 10px; }
 .train-accordion .train-exercise-item { border-color:transparent; background:var(--bg); }
 .train-generate { margin-top:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
@@ -175,7 +199,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 
 .plan-section { width:100%; border-top:1px solid var(--line); margin-top:8px; padding-top:14px; }
 .plan-cards { display:flex; gap:10px; }
-.plan-card { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:var(--card); border:1px solid var(--line); border-radius:14px; font-size:14px; color:var(--ink); }
+.plan-card { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 10px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-card); box-shadow:var(--shadow-card); font-size:14px; color:var(--ink); }
 .plan-card-emoji { font-size:22px; }
 .plan-sheet { gap:12px; }
 .plan-note { line-height:1.5; }
@@ -209,7 +233,7 @@ button:active, .card-text:active, .day-dot:active { opacity:.6; }
 
 .stream-item { padding-bottom:36px; }
 .stream-auto-badge { font-size:11px; color:var(--accent); background:var(--bg); border-radius:999px; padding:2px 8px; }
-.stream-item-link { display:inline-block; font-size:13px; color:var(--accent); margin-bottom:4px; }
+.stream-item-link { display:inline-flex; align-items:center; font-size:13px; color:var(--ink); margin-bottom:4px; padding:4px 10px; border:1px solid var(--line); border-radius:999px; background:transparent; }
 .stream-status-switch { margin-top:6px; margin-bottom:0; }
 .stream-status-switch button:disabled { opacity:1; }
 .stream-sync-hint { color:#b3720a; }

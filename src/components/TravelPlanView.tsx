@@ -135,9 +135,9 @@ function TripCard({ trip, allTrips, onChanged }: { trip: TripRow; allTrips: Trip
     <li className="plan-trip-card trip-edit-card">
       <TripFormFields draft={draft} setDraft={setDraft} conflicts={conflicts} />
       <div className="card-edit">
-        <button onClick={save}>存</button>
-        <button className="card-del-inline" onClick={remove}>删</button>
-        <button onClick={() => setEditing(false)}>取消</button>
+        <button className="btn-primary" onClick={save}>存</button>
+        <button className="btn-muted" onClick={remove}>删</button>
+        <button className="btn-secondary" onClick={() => setEditing(false)}>取消</button>
       </div>
     </li>
   )
@@ -174,8 +174,8 @@ function AddTripCard({ year, allTrips, onAdded, onCancel }: { year: number; allT
     <div className="card trip-edit-card">
       <TripFormFields draft={draft} setDraft={setDraft} conflicts={conflicts} />
       <div className="card-edit">
-        <button onClick={save}>存</button>
-        <button onClick={onCancel}>取消</button>
+        <button className="btn-primary" onClick={save}>存</button>
+        <button className="btn-secondary" onClick={onCancel}>取消</button>
       </div>
     </div>
   )
