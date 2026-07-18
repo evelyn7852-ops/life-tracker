@@ -171,7 +171,7 @@ function AddTripCard({ year, allTrips, onAdded, onCancel }: { year: number; allT
   }
 
   return (
-    <div className="card trip-edit-card">
+    <div className="trip-edit-card">
       <TripFormFields draft={draft} setDraft={setDraft} conflicts={conflicts} />
       <div className="card-edit">
         <button className="btn-primary" onClick={save}>存</button>
