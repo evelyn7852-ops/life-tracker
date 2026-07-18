@@ -52,7 +52,7 @@ describe('DogBanner', () => {
     setTimeoutSpy.mockRestore()
   })
 
-  it('8-20s 后随机切换到另一状态（打盹）', () => {
+  it('8-20s 后先淡出 240ms（姿态不变），再切换到另一状态（打盹）', () => {
     vi.useFakeTimers()
     const randomSpy = vi.spyOn(Math, 'random')
     randomSpy.mockReturnValueOnce(0) // delay factor → 最短 8000ms
@@ -60,6 +60,10 @@ describe('DogBanner', () => {
     render(<DogBanner />)
     expect(document.querySelector('.dog-run')).toBeTruthy()
     act(() => { vi.advanceTimersByTime(8000) })
+    // 240ms 淡出期间姿态仍是 run，只是叠加了淡出 class
+    expect(document.querySelector('.dog-run')).toBeTruthy()
+    expect(document.querySelector('.dog-run.dog-fading')).toBeTruthy()
+    act(() => { vi.advanceTimersByTime(240) })
     expect(document.querySelector('.dog-nap')).toBeTruthy()
     expect(document.querySelector('.dog-run')).toBeNull()
     randomSpy.mockRestore()
@@ -70,7 +74,7 @@ describe('DogBanner', () => {
     const randomSpy = vi.spyOn(Math, 'random')
     randomSpy.mockReturnValueOnce(0).mockReturnValueOnce(0) // pool(排除run)=[nap,eat,scratch] → index0=nap
     render(<DogBanner />)
-    act(() => { vi.advanceTimersByTime(8000) })
+    act(() => { vi.advanceTimersByTime(8240) })
     expect(document.querySelector('.dog-zzz')).toBeTruthy()
     randomSpy.mockRestore()
   })
@@ -80,7 +84,7 @@ describe('DogBanner', () => {
     const randomSpy = vi.spyOn(Math, 'random')
     randomSpy.mockReturnValueOnce(0).mockReturnValueOnce(0.34) // pool(排除run)=[nap,eat,scratch] → index1=eat
     render(<DogBanner />)
-    act(() => { vi.advanceTimersByTime(8000) })
+    act(() => { vi.advanceTimersByTime(8240) })
     expect(document.querySelector('.dog-bone')).toBeTruthy()
     randomSpy.mockRestore()
   })
@@ -100,10 +104,24 @@ describe('DogBanner', () => {
     randomSpy.mockReturnValueOnce(0) // delay factor → 最短 8000ms
     randomSpy.mockReturnValueOnce(0.5) // 权重池 [nap:1,eat:4,scratch:1] 累计区间 [0,1)/[1,5)/[5,6)，0.5*6=3 落入 eat 区间
     render(<DogBanner todayDomains={['food']} />)
-    act(() => { vi.advanceTimersByTime(8000) })
+    act(() => { vi.advanceTimersByTime(8240) })
     // food 偏向 eat，权重最大（4/6），应命中 eat
     expect(document.querySelector('.dog-eat')).toBeTruthy()
     randomSpy.mockRestore()
+  })
+
+  it('走路中偶发嗅地：暂停后头部旋转 -8°，1.5s 后恢复', () => {
+    vi.useFakeTimers()
+    const cryptoSpy = vi.spyOn(crypto, 'getRandomValues').mockImplementation(((arr: Uint32Array) => {
+      arr[0] = 0 // pseudoRandom() → 0：必定触发嗅地，且落在延迟窗口最短处
+      return arr
+    }) as typeof crypto.getRandomValues)
+    render(<DogBanner />)
+    act(() => { vi.advanceTimersByTime(2000) }) // SNIFF_MIN_MS：随机因子为 0 时的最短嗅地延迟
+    expect(document.querySelector('.dog-sniffing')).toBeTruthy()
+    act(() => { vi.advanceTimersByTime(1500) }) // SNIFF_DURATION_MS
+    expect(document.querySelector('.dog-sniffing')).toBeNull()
+    cryptoSpy.mockRestore()
   })
 })
 

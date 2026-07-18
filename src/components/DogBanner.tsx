@@ -7,6 +7,11 @@ const STATES: DogState[] = ['run', 'nap', 'eat', 'scratch']
 const MIN_DELAY_MS = 8000
 const MAX_DELAY_MS = 20000
 const BASE_WEIGHT = 1
+const FADE_MS = 240 // 状态切换：先淡出再换姿态再淡入，240ms（150-250ms 区间内），避免跳变
+const SNIFF_CHANCE = 0.4 // 走路中偶发「嗅地」停顿的触发概率
+const SNIFF_MIN_MS = 2000
+const SNIFF_MAX_MS = 6000
+const SNIFF_DURATION_MS = 1500
 
 /** 从排除当前状态的池中随机取下一个状态，避免连续重复同一动作。（无当日数据时的旧行为，均匀随机） */
 function nextState(current: DogState): DogState {
@@ -55,6 +60,20 @@ function prefersReducedMotion(): boolean {
   }
 }
 
+/**
+ * 独立随机源（不走 Math.random），专供纯presentational 的「嗅地」触发时机使用。
+ * 状态机测试用 vi.spyOn(Math,'random') 精确 mock 了 delay/pool-index 的调用序列，
+ * 嗅地若也消耗 Math.random() 会打乱那套序列；用 crypto 隔开两者，逻辑互不影响。
+ */
+function pseudoRandom(): number {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const arr = new Uint32Array(1)
+    crypto.getRandomValues(arr)
+    return arr[0] / 4294967296
+  }
+  return (Date.now() % 1000) / 1000
+}
+
 export interface DogBannerProps {
   /** 当日已记录的域集合。undefined = 未查询/查询失败 → 走旧的纯随机；已知（含空数组）→ 按权重偏向。 */
   todayDomains?: Domain[]
@@ -66,29 +85,66 @@ export interface DogBannerProps {
 export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
   const [reduced] = useState(prefersReducedMotion)
   const [state, setState] = useState<DogState>('run')
+  const [phase, setPhase] = useState<'idle' | 'fading'>('idle')
+  const [sniffing, setSniffing] = useState(false)
   const weightsRef = useRef<Record<DogState, number> | null>(null)
   weightsRef.current = todayDomains !== undefined ? pickStateWeights(todayDomains, sad) : null
+  // React 的 setState(updater) 函数式写法把 updater 的执行推迟到渲染阶段，不是调用处同步执行；
+  // 若沿用旧写法，紧跟其后同步调用的 schedule()→nextDelay() 反而会先于 updater 消耗掉 Math.random()，
+  // 打乱调用顺序（测试对此有精确 mock）。改用 ref 同步读取「当前状态」，在此处就地同步算出下一状态。
+  const stateRef = useRef<DogState>('run')
 
+  // 状态机（逻辑不变）：延时到点先淡出 240ms，再换姿态，再淡入——不再是瞬间跳变。
   useEffect(() => {
     if (reduced) return
     let cancelled = false
     let timer: ReturnType<typeof setTimeout>
+    let fadeTimer: ReturnType<typeof setTimeout>
     const schedule = () => {
       timer = setTimeout(() => {
         if (cancelled) return
-        setState((prev) => {
+        setPhase('fading')
+        fadeTimer = setTimeout(() => {
+          if (cancelled) return
           const w = weightsRef.current
-          return w ? nextStateWeighted(prev, w) : nextState(prev)
-        })
-        schedule()
+          const next = w ? nextStateWeighted(stateRef.current, w) : nextState(stateRef.current)
+          stateRef.current = next
+          setState(next)
+          setPhase('idle')
+          schedule()
+        }, FADE_MS)
       }, nextDelay())
     }
     schedule()
     return () => {
       cancelled = true
       clearTimeout(timer)
+      clearTimeout(fadeTimer)
     }
   }, [reduced])
+
+  // 偶发嗅地：仅在「跑」状态且未处于淡出中时，按概率安排一次 1.5s 停顿（暂停位移+踏步，头部微低旋转）。
+  useEffect(() => {
+    if (reduced || state !== 'run' || phase !== 'idle') return
+    if (pseudoRandom() > SNIFF_CHANCE) return
+    let cancelled = false
+    let startTimer: ReturnType<typeof setTimeout>
+    let endTimer: ReturnType<typeof setTimeout>
+    const delay = SNIFF_MIN_MS + pseudoRandom() * (SNIFF_MAX_MS - SNIFF_MIN_MS)
+    startTimer = setTimeout(() => {
+      if (cancelled) return
+      setSniffing(true)
+      endTimer = setTimeout(() => {
+        if (cancelled) return
+        setSniffing(false)
+      }, SNIFF_DURATION_MS)
+    }, delay)
+    return () => {
+      cancelled = true
+      clearTimeout(startTimer)
+      clearTimeout(endTimer)
+    }
+  }, [state, phase, reduced])
 
   if (reduced) {
     return (
@@ -98,12 +154,26 @@ export function DogBanner({ todayDomains, sad = false }: DogBannerProps = {}) {
     )
   }
 
+  const outerClass = [
+    'dog', `dog-${state}`,
+    phase === 'fading' ? 'dog-fading' : '',
+    state === 'run' && sniffing ? 'dog-walk-paused' : '',
+  ].filter(Boolean).join(' ')
+
   return (
     <div className="dog-banner" aria-hidden="true">
-      <span className={`dog dog-${state}`}>
-        🐕
-        {state === 'nap' && <span className="dog-zzz">💤</span>}
-        {state === 'eat' && <span className="dog-bone">🦴</span>}
+      <span className={outerClass}>
+        {state === 'run' ? (
+          <span className={`dog-bob${sniffing ? ' dog-bob-paused' : ''}`}>
+            <span className={`dog-body${sniffing ? ' dog-sniffing' : ''}`}>🐕</span>
+          </span>
+        ) : (
+          <>
+            🐕
+            {state === 'nap' && <span className="dog-zzz">💤</span>}
+            {state === 'eat' && <span className="dog-bone">🦴</span>}
+          </>
+        )}
       </span>
     </div>
   )

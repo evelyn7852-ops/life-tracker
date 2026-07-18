@@ -145,14 +145,25 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 /* 贴 tab 栏正上方的固定窄条：tab 栏内容高度(padding 14px*2 + 文字约18px + 上边框1px)≈46px + safe-area。 */
 .dog-banner { position:fixed; left:0; right:0; bottom:calc(46px + env(safe-area-inset-bottom)); max-width:480px; margin:0 auto; width:100%; height:44px; overflow:hidden; pointer-events:none; background:var(--bg); z-index:5; }
 .dog-banner-static { display:flex; align-items:center; justify-content:center; opacity:.8; }
-.dog { position:absolute; bottom:4px; left:45%; font-size:24px; line-height:1; display:inline-block; }
+.dog { position:absolute; bottom:4px; left:45%; font-size:24px; line-height:1; display:inline-block; opacity:1; transition:opacity 240ms var(--ease-out); }
 .dog-sit { position:static; font-size:22px; }
+/* 走：全宽匀速折返（left 4%↔84%，到边缘 scaleX 翻转，不瞬移），内嵌 .dog-bob 叠加 320ms/步的踏步起伏，两层各管一个 transform 互不冲突。 */
 .dog-run { animation:dog-run 9s linear infinite; }
 .dog-nap { animation:dog-bob 3s ease-in-out infinite; opacity:.9; }
 .dog-eat { animation:dog-eat .6s ease-in-out infinite; }
-.dog-scratch { animation:dog-scratch .5s ease-in-out infinite; }
+/* 挠痒：600ms 一次的快速抖动，共 3 次后停在原位，不做无限循环的持续抖动。 */
+.dog-scratch { animation:dog-scratch .6s ease-in-out 3; }
 .dog-zzz { position:absolute; top:-14px; right:-8px; font-size:11px; animation:dog-float 2.4s ease-in-out infinite; }
 .dog-bone { position:absolute; bottom:2px; right:-16px; font-size:13px; }
+/* 状态切换先淡出再换姿态再淡入：优先级需在各状态自身 opacity（如 dog-nap 的 .9）之后，转场时整体归零。 */
+.dog.dog-fading { opacity:0; }
+
+.dog-bob { display:inline-block; animation:dog-bob-step .64s ease-in-out infinite; }
+.dog-body { display:inline-block; transition:transform .3s var(--ease-out); }
+/* 偶发嗅地：走路中随机暂停位移/踏步动画，头部微低旋转 -8°，1.5s 后恢复。 */
+.dog-walk-paused { animation-play-state:paused; }
+.dog-bob-paused { animation-play-state:paused; }
+.dog-body.dog-sniffing { transform:rotate(-8deg); }
 
 @keyframes dog-run {
   0%   { left:4%;  transform:scaleX(1); }
@@ -161,14 +172,11 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
   95%  { left:4%;  transform:scaleX(-1); }
   100% { left:4%;  transform:scaleX(1); }
 }
+@keyframes dog-bob-step { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-1px); } }
 @keyframes dog-bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
 @keyframes dog-eat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
 @keyframes dog-scratch { 0%,100% { transform:rotate(0deg); } 25% { transform:rotate(-8deg); } 75% { transform:rotate(8deg); } }
 @keyframes dog-float { 0% { opacity:0; transform:translateY(0); } 40% { opacity:1; } 100% { opacity:0; transform:translateY(-10px); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .dog-run, .dog-nap, .dog-eat, .dog-scratch, .dog-zzz { animation:none !important; }
-}
 
 .train-actions { display:flex; gap:8px; margin-top:8px; }
 .train-schedule { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
