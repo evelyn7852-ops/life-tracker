@@ -102,6 +102,36 @@ describe('学习流：列表 + 状态分组', () => {
     expect(link.getAttribute('href')).toBe('http://example.com/a')
   })
 
+  it('有 url 时不显示「搜索」，只显示「打开链接」', async () => {
+    listItemsMock.mockResolvedValue([itemRow()])
+    render(<LearningPlanView onClose={() => {}} />)
+    expect(await screen.findByText('打开链接')).toBeTruthy()
+    expect(screen.queryByText('搜索')).toBeFalsy()
+  })
+
+  it('url 为 null 时降级为「搜索」入口，指向 title + source 的 Google 搜索', async () => {
+    listItemsMock.mockResolvedValue([
+      itemRow({ url: null, title: 'MCP 规范', source: 'Anthropic', added_by: 'auto' }),
+    ])
+    render(<LearningPlanView onClose={() => {}} />)
+    const link = await screen.findByText('搜索')
+    expect(screen.queryByText('打开链接')).toBeFalsy()
+    expect(link.getAttribute('href')).toBe(
+      `https://www.google.com/search?q=${encodeURIComponent('MCP 规范 Anthropic')}`,
+    )
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+  })
+
+  it('url 与 source 均为 null 时，搜索词只用 title（不含 null 字样）', async () => {
+    listItemsMock.mockResolvedValue([itemRow({ url: null, source: null, title: '只有标题' })])
+    render(<LearningPlanView onClose={() => {}} />)
+    const link = await screen.findByText('搜索')
+    expect(link.getAttribute('href')).toBe(
+      `https://www.google.com/search?q=${encodeURIComponent('只有标题')}`,
+    )
+  })
+
   it('added_by 为 auto 的条目显示 🤖 推荐 标', async () => {
     listItemsMock.mockResolvedValue([itemRow({ added_by: 'auto' })])
     render(<LearningPlanView onClose={() => {}} />)

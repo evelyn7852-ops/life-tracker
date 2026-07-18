@@ -55,6 +55,15 @@ function AddResourceForm({ onAdded, onCancel }: { onAdded: () => void; onCancel:
   )
 }
 
+/**
+ * 无 url 的条目（多为 auto 推荐：LLM 常记得资源但记不准链接，服务端探活后置 null）
+ * 降级为搜索入口，同 exercises.json 用 B站搜索链接而非视频 id 的既有取舍——搜索必达，死链不可用。
+ */
+function searchUrl(title: string, source: string | null): string {
+  const q = [title, source].filter(Boolean).join(' ')
+  return `https://www.google.com/search?q=${encodeURIComponent(q)}`
+}
+
 function StreamItemCard({ item, onStatusChange, onDelete }: {
   item: LearningItemRow
   onStatusChange: (id: string, status: LearningStatus) => void
@@ -70,9 +79,18 @@ function StreamItemCard({ item, onStatusChange, onDelete }: {
         {item.added_by === 'auto' && <span className="stream-auto-badge">🤖 推荐</span>}
       </div>
       {meta && <p className="muted">{meta}</p>}
-      {item.url && (
-        <a className="stream-item-link" href={item.url} target="_blank" rel="noopener noreferrer">打开链接</a>
-      )}
+      {item.url
+        ? <a className="stream-item-link" href={item.url} target="_blank" rel="noopener noreferrer">打开链接</a>
+        : (
+          <a
+            className="stream-item-link"
+            href={searchUrl(item.title, item.source)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            搜索
+          </a>
+        )}
       {item.note && <p className="card-text">{item.note}</p>}
       <div className="summary-tabs stream-status-switch">
         {STATUS_ORDER.map((s) => (

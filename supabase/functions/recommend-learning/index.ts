@@ -33,7 +33,7 @@ interface Recommendation {
 function buildSystemPrompt(): string {
   return `你是一个 AI 学习资源推荐助手，为一位特定读者挑选资源。只输出 JSON 数组，不要解释、不要 markdown 代码块。
 
-输出格式固定为：[{"title":"...","url":"...","source":"...","tag":"...","note":"..."}]，2-3 条。
+输出格式固定为：[{"title":"...","source":"...","tag":"...","note":"..."}]，2-3 条。
 
 ## 读者画像（推荐必须贴合此人，不是泛泛的「AI 学习者」）
 技术流营销经理（医药行业），自建 AI 工具，动手写代码和 prompt。**不是 ML 研究者，不训练模型**，不关心底层网络结构和训练技巧。
@@ -55,11 +55,19 @@ function buildSystemPrompt(): string {
 
 ## 真实性（硬约束）
 - 只推荐你确信真实存在的资源——知名机构（Anthropic、OpenAI、Google/DeepMind、知名大学、权威行业媒体/期刊等）发布的官方文档、论文、课程、工程博客。
-- 绝不编造 URL 或资源；不确定是否真实存在就不要给。**少给不是问题，编造是致命问题。**
+- 绝不编造资源；不确定是否真实存在就不要给。**少给不是问题，编造是致命问题。**
 - 避免推荐「已有清单」中已列出的标题。
 
+## 关于 URL（重要）
+**url 不是必填字段，默认不要给。** 你对具体 URL 路径的记忆很不可靠——即使资源真实存在，你也常常拼错路径。
+
+- 只在你确信该 URL 真实存在、且确实指向这个资源时才给 url。
+- 不确定就直接省略 url 字段。**省略 url 是完全正确的做法，编造 URL 是严重错误。**
+- 绝不为了凑字段而拼接、猜测或臆造路径（如在域名后接一个「看起来合理」的路径）。
+- 系统会为没有 url 的条目自动提供搜索入口，读者照样能找到资源——所以省略 url 毫无损失。
+
 ## 字段
-title 必填；url 若不确定可省略或留空（不要为凑字段编 URL）；source/tag/note 可选，简短字符串。note 用一句话说明「为什么这条值得这位读者看」。`
+title 必填，写准确、可被搜索到的资源全名。source 写发布方（如 Anthropic、Nature、McKinsey），tag 写方向标签，note 用一句简短中文说明「为什么这条值得这位读者看」。source/tag/note 可选但建议给全——title + source 是读者搜索时的主要线索。`
 }
 
 function buildUserPrompt(existing: ExistingItem[], recentEntries: string[]): string {
@@ -75,7 +83,7 @@ function buildUserPrompt(existing: ExistingItem[], recentEntries: string[]): str
     recentBlock = `\n该用户最近在学的东西（近${RECENT_ENTRY_DAYS}天的学习记录，据此判断她的当前兴趣和水平）：\n${joined}\n`
   }
 
-  return `请为上述读者画像推荐 2-3 条值得学习的 AI 资源，紧扣她关注的四个方向，避开入门/基础类。\n\n${existingLine}\n${recentBlock}\n直接输出 JSON 数组，不要任何解释文字。`
+  return `请为上述读者画像推荐 2-3 条值得学习的 AI 资源，紧扣她关注的四个方向，避开入门/基础类。\n\n${existingLine}\n${recentBlock}\n记住：url 默认省略，除非你确信该链接真实存在且指向该资源。\n直接输出 JSON 数组，不要任何解释文字。`
 }
 
 /** 解析 LLM 返回内容为 JSON；兼容 markdown 代码块包裹（```json ... ```）。解析失败或结果非数组返回 null。 */
@@ -133,6 +141,36 @@ function sanitizeRecommendations(raw: unknown[], existing: ExistingItem[]): Reco
   return result
 }
 
+/**
+ * HEAD 探活：LLM 对 URL 路径的记忆不可靠（真调曾出现 404、臆造路径、title/URL 张冠李戴），
+ * 故服务端逐条验证。非 2xx / 网络错误 / 超时 → 返回 false，调用方把 url 置 null 保留条目，
+ * 客户端降级为搜索按钮（同 exercises.json 用 B站搜索链接而非视频 id 的既有取舍）。
+ * 注意：部分站点（如 McKinsey）对 HEAD 有 bot 拦截，会被误判——可接受：宁可降级为搜索，不给死链。
+ */
+async function verifyUrl(url: string): Promise<boolean> {
+  try {
+    const resp = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      signal: AbortSignal.timeout(6000),
+    })
+    return resp.ok
+  } catch {
+    return false
+  }
+}
+
+/** 逐条验证 url；失效则置 null 但保留条目。验证异常绝不影响条目本身或整轮运行。 */
+async function verifyRecommendationUrls(items: Recommendation[]): Promise<Recommendation[]> {
+  return await Promise.all(items.map(async (item) => {
+    if (!item.url) return item
+    const ok = await verifyUrl(item.url)
+    if (ok) return item
+    console.error(`[recommend-learning] dropping unverifiable url for "${item.title}"`)
+    return { ...item, url: null }
+  }))
+}
+
 async function fetchRecommendationsForUser(
   existing: ExistingItem[],
   recentEntries: string[],
@@ -162,7 +200,8 @@ async function fetchRecommendationsForUser(
 
   const parsed = parseRecommendations(content)
   if (!parsed) return []
-  return sanitizeRecommendations(parsed, existing)
+  const sanitized = sanitizeRecommendations(parsed, existing)
+  return await verifyRecommendationUrls(sanitized)
 }
 
 Deno.serve(async (req) => {
