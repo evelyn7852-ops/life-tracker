@@ -201,12 +201,15 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .dog-reaction-heart-static { animation:none; opacity:1; transform:translateX(-50%); }
 .dog-reaction-bubble { position:absolute; top:-18px; right:-6px; font-size:11px; font-weight:700; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:8px; padding:0 4px; animation:dog-bubble-fade .5s ease-out forwards; }
 
+/* §D 事实：🐕 emoji 本体面朝左。位移向左（X 递减）= 天然朝向，不翻转；
+   位移向右（X 递增）= scaleX(-1) 翻转朝右。翻转严格在折返点同帧切换（45%→50%、100%/0% 边界），
+   保证行进的每一刻脸都朝向位移方向，不会出现「倒着走」。 */
 @keyframes dog-run {
-  0%   { left:4%;  transform:scaleX(1); }
-  45%  { left:84%; transform:scaleX(1); }
-  50%  { left:84%; transform:scaleX(-1); }
-  95%  { left:4%;  transform:scaleX(-1); }
-  100% { left:4%;  transform:scaleX(1); }
+  0%   { left:4%;  transform:scaleX(-1); }
+  45%  { left:84%; transform:scaleX(-1); }
+  50%  { left:84%; transform:scaleX(1); }
+  95%  { left:4%;  transform:scaleX(1); }
+  100% { left:4%;  transform:scaleX(-1); }
 }
 @keyframes dog-bob-step { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-1px); } }
 @keyframes dog-bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
