@@ -113,6 +113,12 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
   position:absolute; inset:0; border-radius:inherit; pointer-events:none;
   border:10px solid rgba(255,255,255,.30);
   outline:1px solid var(--card); outline-offset:-1px;
+  /* backdrop-filter 会作用于元素整个边界（透明中心也被糊掉），必须用 mask 把绘制
+     裁到 border 环带：padding-box 层与全框层 xor/exclude，只留 10px 边框区。 */
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
 }
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   .home-hero-glass-ring {

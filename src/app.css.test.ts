@@ -1,10 +1,8 @@
 import { describe, it, expect } from 'vitest'
+// css 文件的 ?raw 会被 vitest 的 css 处理管线拦截返回空串，故用 node:fs 直读（@types/node 已入 devDeps）
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
 
-const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'app.css')
-const css = readFileSync(cssPath, 'utf-8')
+const css = readFileSync('src/app.css', 'utf-8')
 
 /** §D 狗行走方向：🐕 emoji 本体面朝左，位移向左（X 递减）不翻转、位移向右（X 递增）scaleX(-1)。
  * CSS keyframes 不易在 jsdom 里跑真实动画断言，改为直接解析源文件校验翻转/位移分段是否严格绑定。 */
