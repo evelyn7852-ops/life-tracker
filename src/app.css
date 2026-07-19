@@ -96,26 +96,40 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .bar { height:100%; border-radius:7px; }
 .bar-n { width:24px; text-align:right; font-size:13px; color:var(--muted); }
 
-.home-view { align-items:center; padding-top:0; gap:6px; }
+/* §A V1.8：hero 从满幅出血改为带玻璃框的画卡，文字块下移到图下方的粉底区，
+   min-height 与 .main 的 padding-bottom 公式对齐，让下方文字块能 flex-grow 真正居中
+   （而非被内容撑开、贴着图片下沿）。 */
+.home-view { display:flex; flex-direction:column; align-items:stretch; padding-top:0; gap:0; min-height:calc(100dvh - 116px - env(safe-area-inset-bottom)); }
 
-/* 沉浸式 hero：负外边距抵消 .main 的 12px/16px 内衬，出血到视口顶部与左右边缘；
-   safe-area-top 作内衬（§E klein 废弃，兜底底色改李子紫 --ink，垫在刘海/状态栏之下，避免图片被硬裁）。 */
-.home-hero-wrap { align-self:stretch; margin:-12px -16px 0; padding-top:env(safe-area-inset-top); background:var(--ink); }
-.home-hero { position:relative; height:clamp(60vh, 68vh, 560px); overflow:hidden; background:var(--ink); }
+/* 画卡：左右各留 16px 露出粉底，顶部 safe-area+12px，圆角 20px；兜底色改李子紫 --ink，
+   垫在刘海/状态栏之下、图片加载失败时也不露白。 */
+.home-hero-wrap { align-self:stretch; margin:0 -16px; padding:calc(env(safe-area-inset-top) + 12px) 16px 0; }
+.home-hero { position:relative; height:52vh; overflow:hidden; background:var(--ink); border-radius:20px; }
 .home-hero img { width:100%; height:100%; object-fit:cover; display:block; }
 .home-hero-fallback { background:var(--ink); }
-.home-hero-scrim { position:absolute; inset:0; background:var(--scrim); pointer-events:none; }
-/* §E 对称：封面日期居中排版。 */
-.home-hero-overlay { position:absolute; left:0; right:0; bottom:0; padding:14px 16px 12px; display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; text-align:center; }
-/* 日期放大到 34px 后与时钟同行易挤到换行（CJK 逐字换行会截断词组），故时钟改落一行，
-   日期独占整行宽度、单行显示。 */
-.home-hero-date-row { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
-.home-hero-date { font-size:34px; font-weight:800; }
-.home-hero-clock { font-size:12px; color:rgba(255,255,255,.85); }
-.home-hero-sentence { font-size:16px; color:rgba(255,255,255,.92); width:100%; }
-.home-hero-sentence.one-line { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.home-hero-meta { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
-.home-hero-copyright, .home-hero-quote-author { font-size:10px; color:rgba(255,255,255,.6); }
+/* 液态毛玻璃框：图内侧一圈玻璃环（10px 半透明白 + 模糊），外圈叠一条 1px 奶油细线。
+   降级：不支持 backdrop-filter 的浏览器只保留半透明白框，不叠加模糊（纯色框兜底，视觉仍成立）。 */
+.home-hero-glass-ring {
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  border:10px solid rgba(255,255,255,.30);
+  outline:1px solid var(--card); outline-offset:-1px;
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .home-hero-glass-ring {
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
+  }
+}
+
+/* 图下方文字块：不再叠字，flex-grow 居中排在图与狗条之间的粉底空区。 */
+.home-text-block { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 24px; text-align:center; }
+.home-date-row { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
+.home-date { font-size:30px; font-weight:800; color:var(--ink); }
+.home-clock { font-size:12px; color:var(--muted); }
+.home-sentence { font-size:15px; color:var(--ink); width:100%; }
+.home-sentence-loading { color:var(--muted); letter-spacing:.15em; }
+.home-meta { display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; }
+.home-copyright, .home-quote-author { font-size:11px; color:var(--muted); }
 
 .cal { width:100%; border-top:1px solid var(--line); margin-top:2px; padding-top:10px; }
 .cal-head { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:8px; }
