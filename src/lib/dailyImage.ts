@@ -48,22 +48,36 @@ async function invoke(fast: boolean): Promise<DailyImage | null> {
 
 /**
  * 每日一图，两段式：缓存命中直接回；否则先 fast 调用秒回图（sentence null），
- * 再后台取完整版，句子到位后经 onUpdate 通知并落一整天缓存。
+ * 再后台取完整版补齐句子。
+ *
+ * §B 契约：onSettled 在「完整段尝试结束」后**恰好触发一次**，携带最终结果——
+ * 缓存命中视为立即 settle（携带缓存值）；fast 段失败直接 settle(null)；
+ * fast 成功后台取 full：full 带句 → settle(full) 并落缓存；full 无句/失败 → settle(fast)
+ * （不落缓存，下次打开重试），而不是保持沉默——调用方需要明确知道「完整尝试已结束」
+ * 才能把句子位从 loading 切到 fallback，避免古诗词提前闪现。
  * 失败/离线返回 null（调用方降级为纯色块 + 语录库）。
  */
-export async function fetchDailyImage(onUpdate?: (img: DailyImage) => void): Promise<DailyImage | null> {
+export async function fetchDailyImage(onSettled?: (img: DailyImage | null) => void): Promise<DailyImage | null> {
   const key = todayKey()
   const cached = readCache(key)
-  if (cached) return cached
+  if (cached) {
+    onSettled?.(cached)
+    return cached
+  }
 
   const fast = await invoke(true)
-  if (!fast) return null
+  if (!fast) {
+    onSettled?.(null)
+    return null
+  }
 
-  // 句子后台补齐；LLM 偶发失败时不落缓存，下次打开重试
+  // 句子后台补齐；LLM 偶发失败时不落缓存（下次打开重试），但仍需 settle(fast) 告知调用方「完整尝试已结束」
   void invoke(false).then((full) => {
     if (full?.sentence) {
       writeCache(key, full)
-      onUpdate?.(full)
+      onSettled?.(full)
+    } else {
+      onSettled?.(fast)
     }
   })
 
