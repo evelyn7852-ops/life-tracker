@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMood } from '../hooks/useMood'
 import { formatClock, weekdayZh } from '../lib/dateFormat'
+import { MoodFace, MOOD_STYLES } from './MoodFace'
 
 const MOODS = ['😊', '😐', '😮‍💨', '🥳', '😢', '🤒']
 
@@ -26,9 +27,10 @@ export function MoodHeader({ refreshKey, onSaved, active }: { refreshKey: number
           <button
             key={emoji}
             className={`mood-emoji ${selected === emoji ? 'on' : ''}`}
+            aria-label={MOOD_STYLES[emoji]?.label}
             onClick={() => pick(emoji)}
           >
-            {emoji}
+            <MoodFace mood={emoji} selected={selected === emoji} />
           </button>
         ))}
       </div>

@@ -51,8 +51,8 @@ button:disabled, [aria-disabled="true"] { opacity:.5; pointer-events:none; }
 .mood-header { padding:12px 16px 0; }
 .mood-date { margin-bottom:8px; }
 .mood-row { display:flex; gap:8px; }
-.mood-emoji { font-size:22px; padding:4px 8px; border:1px solid transparent; border-radius:10px; background:none; line-height:1; }
-.mood-emoji.on { border-color:var(--accent); background:var(--card); }
+/* §C：选中态视觉已交给 MoodFace 内部（加深底色 + 树莓环）承担，按钮本身只留触控热区，不再叠框。 */
+.mood-emoji { padding:2px; border:none; border-radius:50%; background:none; line-height:1; display:inline-flex; }
 
 .qi { position:sticky; top:0; background:var(--bg); padding:12px 16px; border-bottom:1px solid var(--line); z-index:10; }
 .qi input { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--line); border-radius:12px; }
